@@ -1,4 +1,4 @@
-## bpx v0.1.0.0 [GNU GPLv3]
+## bpx v0.1.0.1 [GNU GPLv3]
 
 `bpx`(1) is my modification of [bash-preexec](https://github.com/rcaloras/bash-preexec), a set of `preexec` and `precmd` hook functions for `GNU bash`(1) >= 3.2.
 
@@ -7,7 +7,7 @@
 ```
 % git clone https://github.com/D630/bpx.git
 % md5sum bpx.bash
-e622b09595c92c77dc68bd0280210eaa  bpx.bash
+288b84e69f152e9614f54cce2a7185d4  bpx.bash
 ```
 
 ### Usage

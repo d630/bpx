@@ -15,7 +15,7 @@ __bpx_precmd ()
     declare f=
     for f in "${X_BPX_PRECMD_FUNC[@]}"
     do
-        declare -F "$f" 1>/dev/null && $f
+        declare -F "$f" 1>/dev/null && $f "$X_BPX_ERR"
     done
     X_BPX_INTERACTIVE_MODE=on
 }
@@ -36,7 +36,7 @@ else
     done
 fi
 
-__bpx_prompt () { return "$?" ; }
+__bpx_prompt () { declare -gi  X_BPX_ERR=$? ; return "$X_BPX_ERR" ; }
 
 __bpx_main ()
 if [[ $PROMPT_COMMAND == __bpx_prompt\;*__bpx_precmd\; ]]
