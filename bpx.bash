@@ -26,10 +26,10 @@ then
     return 0
 else
     ((BASH_SUBSHELL == 0)) && X_BPX_INTERACTIVE_MODE=
-    declare h1=
+    declare \
+        f= \
+        h1=
     read -r _ h1 < <(HISTTIMEFORMAT= history 1)
-    [[ $h1 ]] || return 0
-    declare f=
     for f in "${X_BPX_PREEXEC_FUNC[@]}"
     do
         declare -F "$f" 1>/dev/null && $f "$h1"
