@@ -12,45 +12,48 @@
 
 __bpx_precmd ()
 {
-    declare f=
+    X_BPX_ERR=$?;
+    declare f=;
     for f in "${X_BPX_PRECMD_FUNC[@]}"
     do
-        declare -F "$f" 1>/dev/null && $f "$X_BPX_ERR"
-    done
-    X_BPX_INTERACTIVE_MODE=on
+        declare -F "$f" 1>/dev/null && ${f} "$X_BPX_ERR"
+    done;
+    X_BPX_INTERACTIVE_MODE=1
 }
 
 __bpx_preexec ()
-if [[ $COMP_LINE || -z $X_BPX_INTERACTIVE_MODE || $BASH_COMMAND == __bpx_prompt ]]
+if [[ $X_BPX_INTERACTIVE_MODE -eq 0 || $BASH_COMMAND == __bpx_precmd || -n $COMP_LINE ]]
 then
     return 0
 else
-    ((BASH_SUBSHELL == 0)) && X_BPX_INTERACTIVE_MODE=
+    ((BASH_SUBSHELL == 0)) && X_BPX_INTERACTIVE_MODE=0;
     declare \
         f= \
-        h1=
-    read -r _ h1 < <(HISTTIMEFORMAT= history 1)
-    for f in "${X_BPX_PREEXEC_FUNC[@]}"
-    do
-        declare -F "$f" 1>/dev/null && $f "$h1"
-    done
+        h1=;
+    ((${#X_BPX_PREEXEC_FUNC[@]} == 0)) || {
+        read -r _ h1 < <(HISTTIMEFORMAT= history 1);
+        for f in "${X_BPX_PREEXEC_FUNC[@]}"
+        do
+            declare -F "$f" 1>/dev/null && $f "$h1";
+        done;
+    }
 fi
 
-__bpx_prompt () { declare -gi  X_BPX_ERR=$? ; return "$X_BPX_ERR" ; }
-
 __bpx_main ()
-if [[ $PROMPT_COMMAND == __bpx_prompt\;*__bpx_precmd\; ]]
+if [[ $PROMPT_COMMAND == __bpx_precmd || -n $X_BPX_ERR ]]
 then
-    return 1
+    return 1;
 else
-    shopt -u extdebug
+    declare -gi \
+        X_BPX_INTERACTIVE_MODE=1 \
+        X_BPX_ERR=0;
     declare -g \
-        X_BPX_INTERACTIVE_MODE= \
         X_BPX_PROMPT_COMMAND_OLD=$PROMPT_COMMAND \
-        PROMPT_COMMAND="__bpx_prompt;${PROMPT_COMMAND%%;}${PROMPT_COMMAND:+;}__bpx_precmd;"
+        PROMPT_COMMAND="__bpx_precmd";
     declare -ga \
         X_BPX_PRECMD_FUNC=() \
-        X_BPX_PREEXEC_FUNC=()
+        X_BPX_PREEXEC_FUNC=();
+    shopt -u extdebug;
     trap '__bpx_preexec' DEBUG
 fi
 
