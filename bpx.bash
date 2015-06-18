@@ -6,55 +6,98 @@
 
 # Forked from Ryan Caloras (ryan@bashhub.com)
 # <https://github.com/rcaloras/bash-preexec>
-# original by Glyph Lefkowitz
+# Original by Glyph Lefkowitz
 
 # -- FUNCTIONS.
 
 __bpx_precmd ()
 {
-    X_BPX_ERR=$?;
-    declare f=;
-    for f in "${X_BPX_PRECMD_FUNC[@]}"
-    do
-        declare -F "$f" 1>/dev/null && ${f} "$X_BPX_ERR"
-    done;
-    X_BPX_INTERACTIVE_MODE=1
+        X_BPX_ERR=$?
+
+        unset -v f
+        typeset f
+
+        for f in "${X_BPX_PRECMD_FUNC[@]}"
+        do
+                1>/dev/null typeset -F "$f" && {
+                        ${f} "$X_BPX_ERR"
+                }
+        done
+
+        wait
+
+        X_BPX_INTERACTIVE_MODE=1
 }
 
 __bpx_preexec ()
-if [[ $X_BPX_INTERACTIVE_MODE -eq 0 || $BASH_COMMAND == __bpx_precmd || -n $COMP_LINE ]]
+if
+        typeset c=$BASH_COMMAND
+        [[
+                $X_BPX_INTERACTIVE_MODE -eq 0 ||
+                $c == __bpx_precmd ||
+                -n $COMP_LINE
+        ]]
 then
-    return 0
+        return 0
 else
-    ((BASH_SUBSHELL == 0)) && X_BPX_INTERACTIVE_MODE=0;
-    declare \
-        f= \
-        h1=;
-    ((${#X_BPX_PREEXEC_FUNC[@]} == 0)) || {
-        read -r _ h1 < <(HISTTIMEFORMAT= history 1);
-        for f in "${X_BPX_PREEXEC_FUNC[@]}"
-        do
-            declare -F "$f" 1>/dev/null && $f "$h1";
-        done;
-    }
+        unset -v \
+                f \
+                h;
+        typeset \
+                f \
+                h1;
+        ((
+                BASH_SUBSHELL == 0 ||
+                ( X_BPX_INTERACTIVE_MODE=0 )
+        ))
+        if
+                (( ${#X_BPX_PREEXEC_FUNC[@]} != 0 ))
+        then
+                read -r _ h1 < <(
+                        HISTTIMEFORMAT= history 1
+                )
+                for f in "${X_BPX_PREEXEC_FUNC[@]}"
+                do
+                        1> /dev/null typeset -F "$f" && {
+                                ${f} "$h1" "$c"
+                        }
+                done
+                wait
+        fi
 fi
 
 __bpx_main ()
-if [[ $PROMPT_COMMAND == __bpx_precmd || -n $X_BPX_ERR ]]
+if
+        [[
+                $PROMPT_COMMAND == __bpx_precmd ||
+                -n $X_BPX_ERR
+        ]]
 then
-    return 1;
+        return 1
 else
-    declare -gi \
-        X_BPX_INTERACTIVE_MODE=1 \
-        X_BPX_ERR=0;
-    declare -g \
-        X_BPX_PROMPT_COMMAND_OLD=$PROMPT_COMMAND \
-        PROMPT_COMMAND="__bpx_precmd";
-    declare -ga \
-        X_BPX_PRECMD_FUNC=() \
-        X_BPX_PREEXEC_FUNC=();
-    shopt -u extdebug;
-    trap '__bpx_preexec' DEBUG
+        unset -v \
+                PROMPT_COMMAND \
+                X_BPX_ERR \
+                X_BPX_INTERACTIVE_MODE \
+                X_BPX_PRECMD_FUNC \
+                X_BPX_PREEXEC_FUNC \
+                X_BPX_PROMPT_COMMAND_OLD;
+        typeset -gi \
+                X_BPX_ERR \
+                X_BPX_INTERACTIVE_MODE=1;
+        typeset -g \
+                PROMPT_COMMAND=__bpx_precmd \
+                X_BPX_PROMPT_COMMAND_OLD=$PROMPT_COMMAND;
+        typeset -ga \
+                X_BPX_PRECMD_FUNC \
+                X_BPX_PREEXEC_FUNC;
+        shopt -u extdebug
+        trap '
+                (
+                        unset -v c
+                        __bpx_preexec
+                )
+        ' DEBUG
 fi
 
 # -- MAIN.
