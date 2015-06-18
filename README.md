@@ -17,7 +17,7 @@ git checkout $(git describe --abbrev=0 --tags)
 
 ##### USAGE
 
-First execute `bpx.bash` with `.` or `source` i your configuraton file for interactive `bash`(1) sessions. This will set up two indexed array variables called `X_BPX_PRECMD_FUNC` and `X_BPX_PREEXEC_FUNC` respectively, which need to be filled with function names. The members of `precmd` are executed before each prompting (see `PROMPT_COMMAND`); `preexec` members are executed after a command has been read and is about to be executed (see the `SIGNAL_SPEC` called `DEBUG`, used via `trap`). Both will send its output to stderr. Any earlier assignment to `PROMPT_COMMAND` will be overwritten with `__bpx_precmd`, but will also be stored as `X_BPX_PROMPT_COMMAND_OLD`.
+First execute `bpx.bash` with `.` or `source` in your configuraton file for interactive `bash`(1) sessions. This will set up two indexed array variables called `X_BPX_PRECMD_FUNC` and `X_BPX_PREEXEC_FUNC` respectively, which need to be filled with function names. The members of `precmd` are executed before each prompting (see `PROMPT_COMMAND`); `preexec` members are executed after a command has been read and is about to be executed (see the `SIGNAL_SPEC` called `DEBUG`, used via `trap`). Both will send its output to stderr. Any earlier assignment to `PROMPT_COMMAND` will be overwritten with `__bpx_precmd`, but will also be stored as `X_BPX_PROMPT_COMMAND_OLD`.
 
 A senseless example:
 
@@ -47,11 +47,14 @@ Now we have:
 ```sh
 % ls
 > BEGIN
-> DO
-> OUTPUT OF: 'ls' IS:
+> SPEAK
+> I typed 'ls', but it is an alias in my conf file.
+> I could check that by comparing ${BASH_ALIASES[ls]} with 'ls --color=auto'.
+> PS: Here is the output of 'ls':
 > README.md  bpx.bash
-> DONE
-> END
+> STOP
+END
+
 ```
 
 ##### LICENCE
