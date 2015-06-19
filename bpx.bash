@@ -14,7 +14,6 @@ __bpx_precmd ()
 {
         X_BPX_ERR=$?
 
-        unset -v f
         typeset f
 
         for f in "${X_BPX_PRECMD_FUNC[@]}"
@@ -40,9 +39,6 @@ if
 then
         return 0
 else
-        unset -v \
-                f \
-                h;
         typeset \
                 f \
                 h1;
@@ -59,7 +55,7 @@ else
                 for f in "${X_BPX_PREEXEC_FUNC[@]}"
                 do
                         1> /dev/null typeset -F "$f" && {
-                                ${f} "$h1" "$c"
+                                ${f} "$c" "$h1"
                         }
                 done
                 wait
@@ -77,7 +73,6 @@ then
 else
         unset -v \
                 PROMPT_COMMAND \
-                X_BPX_ERR \
                 X_BPX_INTERACTIVE_MODE \
                 X_BPX_PRECMD_FUNC \
                 X_BPX_PREEXEC_FUNC \
@@ -92,12 +87,7 @@ else
                 X_BPX_PRECMD_FUNC \
                 X_BPX_PREEXEC_FUNC;
         shopt -u extdebug
-        trap '
-                (
-                        unset -v c
-                        __bpx_preexec
-                )
-        ' DEBUG
+        trap '__bpx_preexec' DEBUG
 fi
 
 # -- MAIN.

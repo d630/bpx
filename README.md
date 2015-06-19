@@ -1,4 +1,4 @@
-"bpx" "1" "Thu Jun 18 09:39:12 UTC 2015" "0.1.3" "README"
+"bpx" "1" "Thu Jun 18 23:58:42 UTC 2015" "0.1.4" "README"
 
 ##### README
 
@@ -29,14 +29,14 @@ function __precmd1 () { echo END ; }
 X_BPX_PREEXEC_FUNC=(__preexec0 __preexec1) ; X_BPX_PRECMD_FUNC=(__precmd0 __precmd1)
 ```
 
-When command history has been enabled, its last entry will be passed as the first argument to the `preexec` mechanism. The second argument is the value of `BASH_COMMAND`.
+When command history has been enabled, its last entry will be passed as the second argument to the `preexec` mechanism. The first argument is the value of `BASH_COMMAND`.
 
 ```sh
 function __preexec2 () {
-echo "I typed '${1}', but it is an alias in my conf file.
-I could check that by comparing \${BASH_ALIASES[${1}]} with '${2}'.
+echo "I typed '${2}', but it is an alias in my conf file.
+I could check that by comparing \${BASH_ALIASES[${2}]} with '${1}'.
 
-PS: Here is the output of '${1}':"
+PS: Here is the output of '${2}':"
 }
 
 X_BPX_PREEXEC_FUNC+=(__preexec2)
@@ -53,7 +53,7 @@ Now we have:
 > PS: Here is the output of 'ls':
 > README.md  bpx.bash
 > STOP
-END
+> END
 
 ```
 
