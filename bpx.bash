@@ -72,7 +72,7 @@ then
         return 1
 else
         unset -v \
-                PROMPT_COMMAND \
+                X_BPX_ERR \
                 X_BPX_INTERACTIVE_MODE \
                 X_BPX_PRECMD_FUNC \
                 X_BPX_PREEXEC_FUNC \
@@ -80,9 +80,9 @@ else
         typeset -gi \
                 X_BPX_ERR \
                 X_BPX_INTERACTIVE_MODE=1;
-        typeset -g \
-                PROMPT_COMMAND=__bpx_precmd \
-                X_BPX_PROMPT_COMMAND_OLD=$PROMPT_COMMAND;
+        typeset -g X_BPX_PROMPT_COMMAND_OLD=$PROMPT_COMMAND
+        unset -v PROMPT_COMMAND
+        typeset -g PROMPT_COMMAND=__bpx_precmd
         typeset -ga \
                 X_BPX_PRECMD_FUNC \
                 X_BPX_PREEXEC_FUNC;
