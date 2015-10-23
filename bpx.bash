@@ -54,7 +54,7 @@ else
                 )
                 for f in "${X_BPX_PREEXEC_FUNC[@]}"
                 do
-                        1> /dev/null typeset -F "$f" && {
+                        1>/dev/null typeset -F "$f" && {
                                 ${f} "$c" "$h1"
                         }
                 done
