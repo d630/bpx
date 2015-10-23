@@ -14,32 +14,32 @@ __bpx_precmd ()
 {
         X_BPX_ERR=$?
 
-        typeset f
+        builtin typeset f
 
         for f in "${X_BPX_PRECMD_FUNC[@]}"
         do
-                1>/dev/null typeset -F "$f" && {
+                1>/dev/null builtin typeset -F "$f" && {
                         ${f} "$X_BPX_ERR"
                 }
         done
 
-        wait
+        builtin wait
 
         X_BPX_INTERACTIVE_MODE=1
 }
 
 __bpx_preexec ()
 if
-        typeset c=$BASH_COMMAND
+        builtin typeset c="$BASH_COMMAND"
         [[
                 $X_BPX_INTERACTIVE_MODE -eq 0 ||
                 $c =~ __bpx_pre(cmd|exec) ||
                 -n $COMP_LINE
         ]]
 then
-        return 0
+        builtin return 0
 else
-        typeset \
+        builtin typeset \
                 f \
                 h1;
         ((
@@ -51,16 +51,16 @@ else
         if
                 (( ${#X_BPX_PREEXEC_FUNC[@]} != 0 ))
         then
-                read -r _ h1 < <(
-                        HISTTIMEFORMAT= history 1
+                builtin read -r _ h1 < <(
+                        HISTTIMEFORMAT= builtin history 1
                 )
                 for f in "${X_BPX_PREEXEC_FUNC[@]}"
                 do
-                        1>/dev/null typeset -F "$f" && {
+                        1>/dev/null builtin typeset -F "$f" && {
                                 ${f} "$c" "$h1"
                         }
                 done
-                wait
+                builtin wait
         fi
 fi
 
@@ -68,25 +68,25 @@ __bpx_main ()
 if
         [[ $PROMPT_COMMAND == __bpx_precmd || -n $X_BPX_ERR ]]
 then
-        return 1
+        builtin return 1
 else
-        unset -v \
+        builtin unset -v \
                 X_BPX_ERR \
                 X_BPX_INTERACTIVE_MODE \
                 X_BPX_PRECMD_FUNC \
                 X_BPX_PREEXEC_FUNC \
                 X_BPX_PROMPT_COMMAND_OLD;
-        typeset -gi \
+        builtin typeset -gi \
                 X_BPX_ERR \
                 X_BPX_INTERACTIVE_MODE=1;
-        typeset -g X_BPX_PROMPT_COMMAND_OLD=$PROMPT_COMMAND
-        unset -v PROMPT_COMMAND
-        typeset -g PROMPT_COMMAND=__bpx_precmd
-        typeset -ga \
+        builtin typeset -g X_BPX_PROMPT_COMMAND_OLD="$PROMPT_COMMAND"
+        builtin unset -v PROMPT_COMMAND
+        builtin typeset -g PROMPT_COMMAND=__bpx_precmd
+        builtin typeset -ga \
                 X_BPX_PRECMD_FUNC \
                 X_BPX_PREEXEC_FUNC;
-        shopt -u extdebug
-        trap '__bpx_preexec' DEBUG
+        builtin shopt -u extdebug
+        builtin trap '__bpx_preexec' DEBUG
 fi
 
 # -- MAIN.
