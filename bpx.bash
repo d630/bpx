@@ -33,7 +33,7 @@ if
         typeset c=$BASH_COMMAND
         [[
                 $X_BPX_INTERACTIVE_MODE -eq 0 ||
-                $c == __bpx_precmd ||
+                $c =~ __bpx_pre(cmd|exec) ||
                 -n $COMP_LINE
         ]]
 then
