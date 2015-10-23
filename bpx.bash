@@ -78,15 +78,18 @@ else
                 X_BPX_PROMPT_COMMAND_OLD;
         builtin typeset -gi \
                 X_BPX_ERR \
-                X_BPX_INTERACTIVE_MODE=1;
+                X_BPX_INTERACTIVE_MODE=1 \
+                X_BPX_USE_PREEXEC=$X_BPX_USE_PREEXEC;
         builtin typeset -g +i X_BPX_PROMPT_COMMAND_OLD="$PROMPT_COMMAND"
         builtin unset -v PROMPT_COMMAND
         builtin typeset -g +i PROMPT_COMMAND=__bpx_precmd
         builtin typeset -g +i -a \
                 X_BPX_PRECMD_FUNC="()" \
                 X_BPX_PREEXEC_FUNC="()";
-        builtin shopt -u extdebug
-        builtin trap '__bpx_preexec' DEBUG
+        (( X_BPX_USE_PREEXEC )) && {
+                builtin shopt -u extdebug
+                builtin trap '__bpx_preexec' DEBUG
+        }
 fi
 
 # -- MAIN.
