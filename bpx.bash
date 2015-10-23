@@ -66,10 +66,7 @@ fi
 
 __bpx_main ()
 if
-        [[
-                $PROMPT_COMMAND == __bpx_precmd ||
-                -n $X_BPX_ERR
-        ]]
+        [[ $PROMPT_COMMAND == __bpx_precmd || -n $X_BPX_ERR ]]
 then
         return 1
 else
