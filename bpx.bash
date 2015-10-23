@@ -92,3 +92,5 @@ fi
 # -- MAIN.
 
 __bpx_main
+
+# vim: set ts=8 sw=8 tw=0 et :
