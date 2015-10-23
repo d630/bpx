@@ -1,10 +1,10 @@
 ##### README
 
-[bpx](https://github.com/D630/bpx) is my modification of [bash-preexec](https://github.com/rcaloras/bash-preexec), a set of `preexec` and `precmd` hook functions for `GNU bash`(1) >= 3.2.
+[bpx](https://github.com/D630/bpx) is my modification of [bash-preexec](https://github.com/rcaloras/bash-preexec), a set of `preexec` and `precmd` hook functions for `GNU bash >= 3.2`.
 
 ##### BUGS & REQUESTS
 
-Feel free to open an issue or put in a pull request on https://github.com/D630/bpx`
+Feel free to open an issue or put in a pull request on https://github.com/D630/bpx
 
 ##### GIT
 
