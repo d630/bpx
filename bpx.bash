@@ -43,8 +43,10 @@ else
                 f \
                 h1;
         ((
-                BASH_SUBSHELL == 0 ||
-                ( X_BPX_INTERACTIVE_MODE=0 )
+                X_BPX_INTERACTIVE_MODE =
+                BASH_SUBSHELL == 0
+                ? 1
+                : 0
         ))
         if
                 (( ${#X_BPX_PREEXEC_FUNC[@]} != 0 ))
