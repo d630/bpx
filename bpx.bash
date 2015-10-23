@@ -49,7 +49,7 @@ else
                 : 0
         ))
         if
-                (( ${#BPX_PREEXEC_FUNC[@]} != 0 ))
+                (( ${#BPX_PREEXEC_FUNC[@]} ))
         then
                 builtin read -r _ h1 < <(
                         HISTTIMEFORMAT= builtin history 1
