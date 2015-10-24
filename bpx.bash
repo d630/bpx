@@ -23,7 +23,7 @@ __bpx_precmd ()
                 }
         done
 
-        builtin wait
+        #builtin wait
 
         BPX_INTERACTIVE_MODE=1
 }
@@ -60,7 +60,7 @@ else
                                 ${f} "$c" "$h1"
                         }
                 done
-                builtin wait
+                #builtin wait
         fi
 fi
 
