@@ -33,7 +33,7 @@ if
         builtin typeset c="$BASH_COMMAND"
         [[
                 $BPX_INTERACTIVE_MODE -eq 0 ||
-                $c =~ __bpx_pre(cmd|exec) ||
+                $c =~ ^__bpx_pre(cmd|exec)$ ||
                 -n $COMP_LINE
         ]]
 then
