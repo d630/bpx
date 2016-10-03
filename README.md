@@ -114,8 +114,7 @@ BPX_PRECMD_FUNC[0]=__prompt_command
 
 ###### Using the history
 
-The history thing in Bash depends really on your configuration. In both mechanisms you can get the commands from the line by running `history 1`. In `preexec` you may also use the keys `BPX_PROMPT[#]` and `BPX_PROMPT[!]`. Remember, that `preexec` functions will be executed in a subshell and cannot be passed directly to `precmd` functions.
-
+The history thing in Bash depends really on your configuration. In both mechanisms you can get the commands from the line by running `history 1` and expand the prompt strings `\#` and `\!`. In `preexec` you may also use the key `BPX_PROMPT[!]`. Remember, that `preexec` functions will be executed in a subshell and cannot be passed directly to `precmd` functions.
 
 ```sh
 function func4 {
