@@ -33,11 +33,13 @@ bpx will set up two indexed array variables called `BPX_PRECMD_FUNC` and `BPX_PR
 
 ```
 Regular:
-! # $ @ A H T V W d h j l s t u v w
+! @ A T d t
 
 Further:
 unixtime (seconds since 1970-01-01 00:00:00 UTC; set via "\D{%s}")
 ```
+
+These and all other prompt strings may be expanded with `${var@P}` (new in bash 4.4).
 
 The current exit status (`$?`) will be inherited as `BPX_ERR` to the `precmd` mechanism and is available as "last" status in `preexec` functions.
 
@@ -87,24 +89,12 @@ After typing the command `true` I get:
 BEGIN
 SPEAK
     ! -> 1447
-    # -> 4
-    $ -> $
     unixtime -> 1475509325
     @ -> 04:42 PM
     A -> 16:42
-    H -> ME
     T -> 04:42:05
-    V -> 4.4.0
-    W -> ~
     d -> Mon Oct 03
-    h -> ME
-    j -> 0
-    l -> 6
-    s -> bash
     t -> 16:42:05
-    u -> user1
-    v -> 4.4
-    w -> ~
 STOP
 END
 ```

@@ -71,25 +71,13 @@ else
                         builtin unset -f typeset;
                         builtin unalias typeset 2>/dev/null;
                         typeset -A BPX_PROMPT=(
-                                [#]="\#"
                                 [A]="\A"
-                                [H]="\H"
                                 [T]="\T"
-                                [V]="\V"
-                                [W]="\W"
-                                [\$]="\$"
                                 [\\!]="\!"
                                 [\\@]="\@"
                                 [d]="\d"
-                                [h]="\h"
-                                [j]="\j"
-                                [l]="\l"
-                                [s]="\s"
                                 [t]="\t"
-                                [u]="\u"
                                 [unixtime]="\D{%s}"
-                                [v]="\v"
-                                [w]="\w"
                         );
                         # 0
                         # }
