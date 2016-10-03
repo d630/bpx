@@ -23,7 +23,7 @@ __bpx_precmd ()
                 then
                         "$__"
                 else
-                        printf 'bash: bpx: function %s is not declared\n' "$__"
+                        1>&2 builtin printf "bash: bpx: function '%s' is not declared\n\r" "$__"
                 fi
         done
 }
@@ -39,7 +39,7 @@ __bpx_preexec ()
                 then
                         "$__"
                 else
-                        printf 'bash: bpx: function %s is not declared\n' "$__"
+                        1>&2 builtin printf "bash: bpx: function '%s' is not declared\n\r" "$__"
                 fi
         done
 }
@@ -51,22 +51,58 @@ then
         builtin return 1
 else
         builtin unset -v \
-                BPX_PROMPT_COMMAND_OLD \
-                BPX_PS0_OLD;
-        builtin typeset -g +i \
-                BPX_PROMPT_COMMAND_OLD="$PROMPT_COMMAND" \
-                BPX_PS0_OLD="$PS0";
+                BPX_PROMPT_COMMAND_ORIG \
+                BPX_PS0_ORIG;
+        builtin typeset -g \
+                BPX_PROMPT_COMMAND_ORIG="$PROMPT_COMMAND" \
+                BPX_PS0_ORIG="$PS0";
         builtin unset -v \
                 BPX_ERR \
                 BPX_PRECMD_FUNC \
                 BPX_PREEXEC_FUNC \
+                BPX_PS0 \
                 PROMPT_COMMAND \
                 PS0;
         builtin typeset -gi BPX_ERR
-        builtin typeset -g +i \
+        builtin typeset -g BPX_PS0='$(
+                        # {
+                        # 0
+                        builtin unset -v BPX_PROMPT;
+                        builtin unset -f typeset;
+                        builtin unalias typeset 2>/dev/null;
+                        typeset -A BPX_PROMPT=(
+                                [#]="\#"
+                                [A]="\A"
+                                [H]="\H"
+                                [T]="\T"
+                                [V]="\V"
+                                [W]="\W"
+                                [\$]="\$"
+                                [\\!]="\!"
+                                [\\@]="\@"
+                                [d]="\d"
+                                [h]="\h"
+                                [j]="\j"
+                                [l]="\l"
+                                [s]="\s"
+                                [t]="\t"
+                                [u]="\u"
+                                [unixtime]="\D{%s}"
+                                [v]="\v"
+                                [w]="\w"
+                        );
+                        # 0
+                        # }
+                        # {
+                        # 1
+                        __bpx_preexec
+                        # 1
+                        # }
+                )';
+        builtin typeset -g \
                 PROMPT_COMMAND=__bpx_precmd \
-                PS0='$(__bpx_preexec)';
-        builtin typeset -g +i -a \
+                PS0="$BPX_PS0";
+        builtin typeset -g -a \
                 BPX_PRECMD_FUNC="()" \
                 BPX_PREEXEC_FUNC="()";
 fi
