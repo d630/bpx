@@ -27,32 +27,15 @@ Just put `bpx.bash` elsewhere on your `PATH` and then execute it with `.` or `so
 
 ##### DESCRIPTION
 
-bpx will set up two indexed array variables called `BPX_PRECMD_FUNC` and `BPX_PREEXEC_FUNC` respectively, which need to be filled with function names. The members of `precmd` are executed before each prompting (see `PROMPT_COMMAND`); `preexec` members are executed in a command substitution when `PS0` is beeing expanded. Both will send its output to stderr. Any earlier assignment to `PROMPT_COMMAND` and `PSO` will be overwritten with `__bpx__precmd` and the value of `BPX_PS0`, and be stored as `BPX_PROMPT_COMMAND_ORIG` and `BPX_PS0_ORIG`.
+bpx will set up two indexed array variables called `BPX_PRECMD_FUNC` and `BPX_PREEXEC_FUNC` respectively, which need to be filled with function names. The members of `precmd` are executed before each prompting (see `PROMPT_COMMAND`); `preexec` members are executed in a command substitution when `PS0` is beeing expanded. Both will send its output to stderr. Any earlier assignment to `PROMPT_COMMAND` and `PSO` will be overwritten with `__bpx_precmd` and the value of `BPX_PS0`, and be stored as `BPX_PROMPT_COMMAND_ORIG` and `BPX_PS0_ORIG`.
 
-`preexec` functions have access to an associative array variable called `BPX_PROMPT` with the following keys (see the manual(https://www.gnu.org/software/bash/manual/bash.html#Controlling-the-Prompt) for a description):
+`preexec` functions have access to an associative array variable called `BPX_PROMPT` with the following keys (see the [manual](https://www.gnu.org/software/bash/manual/bash.html#Controlling-the-Prompt) for a description)):
 
 ```
-!
-#
-$
-@
-A
-H
-T
-V
-W
-d
-h
-j
-l
-s
-t
-u
-v
-w
+Regular:
+! # $ @ A H T V W d h j l s t u v w
 
 Further:
-
 unixtime (seconds since 1970-01-01 00:00:00 UTC; set via "\D{%s}")
 ```
 
