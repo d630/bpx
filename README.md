@@ -186,6 +186,10 @@ BPX_PRECMD_FUNC[0]=use_my_own
 
 Just unset or edit PS0. You may switch it on again by setting `PS0=$BPX_PS0`.
 
+###### Don't wanna use `precmd` at all
+
+Just unset or edit PROMPT_COMMAND. You may switch it on again by setting it to `__bpx_precmd`.
+
 ##### NOTICE
 
 bpx has been written in [GNU bash 4.4.0(1)-release](http://www.gnu.org/software/bash/) on [Debian GNU/Linux 9 (stretch/sid)](https://www.debian.org).
