@@ -27,7 +27,7 @@ Just put `bpx.bash` elsewhere on your `PATH` and then execute it with `.` or `so
 
 ##### DESCRIPTION
 
-bpx will set up two indexed array variables called `BPX_PRECMD_FUNC` and `BPX_PREEXEC_FUNC` respectively, which need to be filled with function names. The members of `precmd` are executed before each prompting (see `PROMPT_COMMAND`); `preexec` members are executed in a command substitution when `PS0` is beeing expanded. Both will send its output to stderr. Any earlier assignment to `PROMPT_COMMAND` and `PSO` will be overwritten with `__bpx_precmd` and the value of `BPX_PS0`, and be stored as `BPX_PROMPT_COMMAND_ORIG` and `BPX_PS0_ORIG`.
+bpx will set up two indexed array variables called `BPX_PRECMD_FUNC` and `BPX_PREEXEC_FUNC` respectively, which need to be filled with function names. The members of `precmd` are executed before each prompting (see `PROMPT_COMMAND`); `preexec` members are executed in a command substitution when `PS0` is beeing expanded. Both will send its output to stderr. Any earlier assignment to `PROMPT_COMMAND` and `PSO` will be overwritten with `__bpx_precmd` and the value of `BPX_PS0_DEFAULT`, and be stored as `BPX_PROMPT_COMMAND_ORIG` and `BPX_PS0_ORIG`.
 
 `preexec` functions have access to an associative array variable called `BPX_PROMPT` with the following keys (see the [manual](https://www.gnu.org/software/bash/manual/bash.html#Controlling-the-Prompt) for a description):
 
@@ -164,9 +164,9 @@ function reset_ps0 {
     if ((BPX_ERR > 0))
     then
         echo resetting PS0
-        PS0='Nice try\n'${BPX_PS0}
+        PS0='Nice try\n'${BPX_PS0_DEFAULT}
     else
-        PS0=$BPX_PS0
+        PS0=$BPX_PS0_DEFAULT
     fi
 }
 
@@ -174,7 +174,7 @@ BPX_PRECMD_FUNC+=(reset_ps0)
 
 function use_my_own {
     ((USE_MY_OWN)) || {
-        PS0=$(sed -n '/# 0/,/# 0/d;p' <<< "$BPX_PS0");
+        PS0=$(sed -n '/# 0/,/# 0/d;p' <<< "$BPX_PS0_DEFAULT");
         USE_MY_OWN=1
     }
 }
@@ -184,11 +184,22 @@ BPX_PRECMD_FUNC[0]=use_my_own
 
 ###### Don't wanna use `preexec` at all
 
-Just unset or edit PS0. You may switch it on again by setting `PS0=$BPX_PS0`.
+Just unset or edit PS0. You may switch it on again by setting `PS0=$BPX_PS0_DEFAULT`.
 
 ###### Don't wanna use `precmd` at all
 
-Just unset or edit PROMPT_COMMAND. You may switch it on again by setting it to `__bpx_precmd`.
+Just unset or edit PROMPT_COMMAND. You may switch it on again by setting it to `PROMPT_COMMAND=$BPX_PROMPT_COMMAND_DEFAULT`.
+
+###### Wanna reload bpx without sourcing
+
+These lines unset also your BPX_PRE{CMD,EXEC}_FUNC arrays.
+
+```sh
+PROMPT_COMMAND=$BPX_PROMPT_COMMAND_ORIG
+PS0=$BPX_PS0_ORIG
+unset -v BPX_ERR
+__bpx_main
+```
 
 ##### NOTICE
 

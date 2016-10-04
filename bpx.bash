@@ -19,7 +19,7 @@ __bpx_precmd ()
         for __ in "${BPX_PRECMD_FUNC[@]}"
         do
                 if
-                        1>/dev/null builtin typeset -F "$__"
+                        1>/dev/null builtin typeset -f "$__"
                 then
                         "$__"
                 else
@@ -35,7 +35,7 @@ __bpx_preexec ()
         for __ in "${BPX_PREEXEC_FUNC[@]}"
         do
                 if
-                        1>/dev/null builtin typeset -F "$__"
+                        1>/dev/null builtin typeset -f "$__"
                 then
                         "$__"
                 else
@@ -46,25 +46,28 @@ __bpx_preexec ()
 
 __bpx_main ()
 if
-        [[ $PROMPT_COMMAND == __bpx_precmd || -v BPX_ERR ]]
+        [[ -v BPX_ERR ]]
 then
         builtin return 1
 else
         builtin unset -v \
-                BPX_PROMPT_COMMAND_ORIG \
-                BPX_PS0_ORIG;
-        builtin typeset -g \
-                BPX_PROMPT_COMMAND_ORIG="$PROMPT_COMMAND" \
-                BPX_PS0_ORIG="$PS0";
-        builtin unset -v \
                 BPX_ERR \
                 BPX_PRECMD_FUNC \
                 BPX_PREEXEC_FUNC \
-                BPX_PS0 \
+                BPX_PROMPT_COMMAND_DEFAULT \
+                BPX_PROMPT_COMMAND_ORIG \
+                BPX_PS0_DEFAULT \
+                BPX_PS0_ORIG;
+        [[ -v PROMPT_COMMAND ]] && \
+                builtin typeset -g BPX_PROMPT_COMMAND_ORIG="$PROMPT_COMMAND";
+        [[ -v PS0 ]] && builtin typeset -g BPX_PS0_ORIG="$PS0";
+        builtin unset -v \
                 PROMPT_COMMAND \
                 PS0;
-        builtin typeset -gi BPX_ERR
-        builtin typeset -g BPX_PS0='$(
+        builtin typeset -gi BPX_ERR=
+        builtin typeset -g \
+                BPX_PROMPT_COMMAND_DEFAULT=__bpx_precmd \
+                BPX_PS0_DEFAULT='$(
                         # {
                         # 0
                         builtin unset -v BPX_PROMPT;
@@ -88,8 +91,8 @@ else
                         # }
                 )';
         builtin typeset -g \
-                PROMPT_COMMAND=__bpx_precmd \
-                PS0="$BPX_PS0";
+                PROMPT_COMMAND="$BPX_PROMPT_COMMAND_DEFAULT" \
+                PS0="$BPX_PS0_DEFAULT";
         builtin typeset -g -a \
                 BPX_PRECMD_FUNC="()" \
                 BPX_PREEXEC_FUNC="()";
