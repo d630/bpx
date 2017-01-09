@@ -35,16 +35,16 @@ A hook function executes functions in an array, which has the same name as the f
 
 1. *preread* is executed in a "keyseq:shell-command" binding before the readline-function *accept-line* is called (*READLINE_{LINE,POINT}* available). The status code of the last command line execution is in the *?* parameter. Array functions have also access to two indexed array variables with different lengths:
     - *rl1* holds the strings that the user has typed (regardless of command history). If the index is greater than zero, the value holds a line, that was typed in on the secondary prompt (*PS2*);
-    - *rl2* contains the full command line in the style it would being displayed as function definition. Alias expansion is performed outside of command and process substitutions; history expansion is performed just once.
-2. *preexec* works with the *DEBUG trap* and is executed for every command in the command list (*BASH_COMMAND* available). It tries to suppresses traps in subshells any tracing. If command history is active, the parameter *histcmd* holds the output of `HISTTIMEFORMAT= history 1` with the history number removed, otherwise it's the empty string. (**not recommended**)
+    - *rl2* contains the full command line in the style of function definitions. Alias expansion is performed outside of command and process substitutions; history expansion is performed just once.
+2. *preexec* works with the *DEBUG trap* and is executed for every command in the command list (*BASH_COMMAND* available). It tries to suppresses traps in subshells and any tracing. If command history is active, the parameter *histcmd* holds the output of `HISTTIMEFORMAT= history 1` with the history number removed, otherwise it's the empty string. (**not recommended**)
 3. *precmd* works with the *PROMPT_COMMAND* variable and is executed before each prompting of the primary prompt (*PS1*).
-4. *postread* is executed in a "keyseq:shell-command" binding after the readline-function *accept-line* has been executed. Has access to the status code of the most recently executed command line (like *precmd* has).
+4. *postread* is executed in a "keyseq:shell-command" binding after the readline-function *accept-line* has been executed. There is access to the status code of the most recently executed command line (like *precmd* has).
 
 In *preread* (and then also in *preexec*) you can use the function *__bpx_define_rl3* to get a third indexed array variable: *rl3* points to the command line that will be executed (like *rl2*), but each index only points to one word.
 
 ### preread and postread
 
-Internally, bpx binds six key sequences, which have to be bind as macro to a key sequence of your choice:
+Internally, bpx binds six key sequences, which have to be bind as macro to a key or key sequence of your choice:
 
 * *\C-x\C-x1* binds the important internal variable *rl0*
 * *\C-x\C-x2* invokes *history-expand-line*
@@ -53,7 +53,7 @@ Internally, bpx binds six key sequences, which have to be bind as macro to a key
 * *\C-x\C-x5* invokes *accept-line*
 * *\C-x\C-x6* executes *__bpx_postread*
 
-If you only wanna use *preread*, bind first the macro `\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5` to a key seq like in `bind 'C-j: "macro"'`. Then make sure bpx has sane internal variables, when the next hook takes place:
+If you only want to use *preread*, at first bind the macro `\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5` to a key seq like in `bind 'C-j: "macro"'`. Then make sure bpx has sane internal variables, when the next hook takes place:
 
 ```sh
 # set bpx_var to 0
@@ -63,9 +63,9 @@ PS1='${_[ bpx_var=0, 1 ]}\u@\h \w \$ '
 PS2='${_[ bpx_var+=1, 1 ]}> '
 ```
 
-If you only wanna use *postread*, bind the following macro like in `bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x3\C-x\C-x5\C-x\C-x6"` and reset *bpx_var*.
+If you only want to use *postread*, bind the following macro as shown in `bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x3\C-x\C-x5\C-x\C-x6"` and reset *bpx_var*.
 
-And in order to define both, run `bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6"`.
+And in order to define both of them, run `bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6"`.
 
 In summary (lol):
 
