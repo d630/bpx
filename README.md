@@ -40,7 +40,7 @@ A hook function executes functions in an array, which has the same name as the f
 3. *precmd* works with the *PROMPT_COMMAND* variable and is executed before each prompting of the primary prompt (*PS1*).
 4. *postread* is executed in a "keyseq:shell-command" binding after the readline-function *accept-line* has been executed. Has access to the status code of the most recently executed command line (like *precmd* has).
 
-In *preread* (and then also in *preexec*) you can use the function *__bpx_define_rl3* to get a third indexed array variable: *rl3* will point to the command line that will be executed (like *rl2*), but each index only points to one word.
+In *preread* (and then also in *preexec*) you can use the function *__bpx_define_rl3* to get a third indexed array variable: *rl3* points to the command line that will be executed (like *rl2*), but each index only points to one word.
 
 ### preread and postread
 
@@ -63,7 +63,7 @@ PS1='${_[ bpx_var=0, 1 ]}\u@\h \w \$ '
 PS2='${_[ bpx_var+=1, 1 ]}> '
 ```
 
-If you only wanna use *postread*, bind the follwing macro like in `bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x3\C-x\C-x5\C-x\C-x6"` and reset *bpx_var*.
+If you only wanna use *postread*, bind the following macro like in `bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x3\C-x\C-x5\C-x\C-x6"` and reset *bpx_var*.
 
 And in order to define both, run `bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6"`.
 
@@ -115,7 +115,7 @@ shopt -s promptvars
 function preread {
     typeset s=$?
 
-    # The following strings will be shown over your prompt.
+    # The following strings will be shown above your prompt.
     tput setaf 1
     printf "%sPREREAD%s\nlast def of READLINE_LINE was:\n\t<%s>\n" \
         -- -- "$READLINE_LINE"
@@ -125,7 +125,7 @@ function preread {
     # Define also array *rl3*. Also usable in *preexec*
     '__bpx_define_rl3';
 
-    # Some strings shall be printed under your prompt. To achieve this, we
+    # Some strings shall be printed below your prompt. To achieve this, we
     # assign the *PSO* parameter (see below). We cannot set *PSO* directly in
     # *preread*, so let's use a workaround.
     ps0=$(
@@ -192,7 +192,7 @@ postread_functions=(postread)
 bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6"'
 
 # Make sure internal variables are set on time, when using the macro. *ps0* is
-# used as helper in *preread*. Make also *PS0* a bit nicer for our test and put
+# used as helper in *preread*. Make also *PS2* a bit nicer for our test and put
 # a newline into *PS1* to see what happens.
 export PS1='${_[ ps0[1]=9999, bpx_var=0, 1 ]}--PS1--\n\u@\h \w \$ '
 export PS2='${bpx_var[ bpx_var+=1, 0 ]}> '

@@ -245,7 +245,7 @@ function __bpx_main {
 # function preread {
 #     typeset s=$?
 
-#     # The following strings will be shown over your prompt.
+#     # The following strings will be shown above your prompt.
 #     tput setaf 1
 #     printf "%sPREREAD%s\nlast def of READLINE_LINE was:\n\t<%s>\n" \
 #         -- -- "$READLINE_LINE"
@@ -255,7 +255,7 @@ function __bpx_main {
 #     # Define also array *rl3*. Also usable in *preexec*
 #     '__bpx_define_rl3';
 
-#     # Some strings shall be printed under your prompt. To achieve this, we
+#     # Some strings shall be printed below your prompt. To achieve this, we
 #     # assign the *PSO* parameter (see below). We cannot set *PSO* directly in
 #     # *preread*, so let's use a workaround.
 #     ps0=$(
@@ -322,7 +322,7 @@ function __bpx_main {
 # bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6"'
 
 # # Make sure internal variables are set on time, when using the macro. *ps0* is
-# # used as helper in *preread*. Make also *PS0* a bit nicer for our test and put
+# # used as helper in *preread*. Make also *PS2* a bit nicer for our test and put
 # # a newline into *PS1* to see what happens.
 # export PS1='${_[ ps0[1]=9999, bpx_var=0, 1 ]}--PS1--\n\u@\h \w \$ '
 # export PS2='${bpx_var[ bpx_var+=1, 0 ]}> '
