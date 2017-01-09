@@ -324,7 +324,7 @@ function __bpx_main {
 # # Make sure internal variables are set on time, when using the macro. *ps0* is
 # # used as helper in *preread*. Make also *PS2* a bit nicer for our test and put
 # # a newline into *PS1* to see what happens.
-# export PS1='${_[ ps0[1]=9999, bpx_var=0, 1 ]}--PS1--\n\u@\h \w \$ '
+# export PS1='${_[ ps0=9999, bpx_var=0, 1 ]}--PS1--\n\u@\h \w \$ '
 # export PS2='${bpx_var[ bpx_var+=1, 0 ]}> '
 # export PS0='${ps0#9999}'
 
