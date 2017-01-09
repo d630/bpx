@@ -1,12 +1,16 @@
-##### README
+## README
 
-[bpx](https://github.com/D630/bpx) is my modification of [bash-preexec](https://github.com/rcaloras/bash-preexec), a set of `preexec` and `precmd` hook functions for `GNU bash >= 4.4`.
+[bpx](https://github.com/D630/bpx) is a bash shell procedure/script which simulates the zsh hook functions *preexec* and *precmd*, (like [bash-preexec](https://github.com/rcaloras/bash-preexec)) but in an unsual manner: instead of doing the preexecution hook with the *DEBUG trap*, bpx involves Readline by using the *bind* builtin command to work with the readline buffer. That's why bpx defines the hook functions *preexec* and *precmd* as well as *preread* and *postread*.
 
-##### BUGS & REQUESTS
+bpx is, though, still a hacky business, no doubt. But it remembers the real bahviour of zsh: preexec functions are executed after the command line (aka. command list) has been read and is about to be executed; they are **not** beeing executed before each command execution of the list. Actually, the second and third parameters of its functions don't even obtain the whole expansion; alias expansion in command and process substitution, for example, is not performed. That is: one command line, one preexec hook!
 
-Feel free to open an issue or put in a pull request on https://github.com/D630/bpx
+bpx works best in bash 4.4 (*PS0*) and has been tested with the emacs line editing mode in an interactive instance that was not running in an Emacs shell buffer. Please let me know, how to do it with the vi mode (which is, btw, also the POSIX line editing mode). bash must run without its *--noediting* option, of course.
 
-##### GIT
+## BUGS & REQUESTS
+
+Feel free to open an issue or put in a pull request on https://github.com/D630/bpx. See also the comments in the script.
+
+## GIT
 
 To download the very latest source code:
 
@@ -21,190 +25,202 @@ cd -- ./bpx
 git checkout $(git describe --abbrev=0 --tags)
 ```
 
-##### INSTALL
+## INSTALL
 
-Just put `bpx.bash` elsewhere on your `PATH` and then execute it with `.` or `source` in your configuraton file for interactive bash sessions (usually `.bashrc`).
+Just put *bpx.bash* elsewhere on your *PATH* and then execute it with `.` or `source` in your configuraton file for interactive bash sessions (usually *.bashrc*).
 
-##### DESCRIPTION
+## USAGE
 
-bpx will set up two indexed array variables called `BPX_PRECMD_FUNC` and `BPX_PREEXEC_FUNC` respectively, which need to be filled with function names. The members of `precmd` are executed before each prompting (see `PROMPT_COMMAND`); `preexec` members are executed in a command substitution when `PS0` is beeing expanded. Both will send its output to stderr. Any earlier assignment to `PROMPT_COMMAND` and `PSO` will be overwritten with `__bpx_precmd` and the value of `BPX_PS0_DEFAULT`, and be stored as `BPX_PROMPT_COMMAND_ORIG` and `BPX_PS0_ORIG`.
+A hook function executes functions in an array, which has the same name as the function + "_functions" appended (like "preread_functions"). All functions redirect to stderr. It makes sense to use *preread* with *PS0*.
 
-`preexec` functions have access to an associative array variable called `BPX_PROMPT` with the following keys (see the [manual](https://www.gnu.org/software/bash/manual/bash.html#Controlling-the-Prompt) for a description):
+1. *preread* is executed in a "keyseq:shell-command" binding before the readline-function *accept-line* is called (*READLINE_{LINE,POINT}* available). The status code of the last command line execution is in the *?* parameter. Array functions have also access to two indexed array variables with different lengths:
+    - *rl1* holds the strings that the user has typed (regardless of command history). If the index is greater than zero, the value holds a line, that was typed in on the secondary prompt (*PS2*);
+    - *rl2* contains the full command line in the style it would being displayed as function definition. Alias expansion is performed outside of command and process substitutions; history expansion is performed just once.
+2. *preexec* works with the *DEBUG trap* and is executed for every command in the command list (*BASH_COMMAND* available). It tries to suppresses traps in subshells any tracing. If command history is active, the parameter *histcmd* holds the output of `HISTTIMEFORMAT= history 1` with the history number removed, otherwise it's the empty string. (**not recommended**)
+3. *precmd* works with the *PROMPT_COMMAND* variable and is executed before each prompting of the primary prompt (*PS1*).
+4. *postread* is executed in a "keyseq:shell-command" binding after the readline-function *accept-line* has been executed. Has access to the status code of the most recently executed command line (like *precmd* has).
 
-```
-Regular:
-! @ A T d t
+In *preread* (and then also in *preexec*) you can use the function *__bpx_define_rl3* to get a third indexed array variable: *rl3* will point to the command line that will be executed (like *rl2*), but each index only points to one word.
 
-Further:
-unixtime (seconds since 1970-01-01 00:00:00 UTC; set via "\D{%s}")
-```
+### preread and postread
 
-These and all other prompt strings may be expanded with `${var@P}` (new in bash 4.4).
+Internally, bpx binds six key sequences, which have to be bind as macro to a key sequence of your choice:
 
-The current exit status (`$?`) will be inherited as `BPX_ERR` to the `precmd` mechanism and is available as "last" status in `preexec` functions.
+* *\C-x\C-x1* binds the important internal variable *rl0*
+* *\C-x\C-x2* invokes *history-expand-line*
+* *\C-x\C-x3* executes *__bpx_read_line*
+* *\C-x\C-x4* executes *__bpx_read_line* and *__bpx_preread* in a shell command list
+* *\C-x\C-x5* invokes *accept-line*
+* *\C-x\C-x6* executes *__bpx_postread*
 
-##### EXAMPLES
-
-###### Some nonsens
-
-```sh
-function func0 { echo BEGIN; }
-function func1 { printf '%s\n\r' SPEAK; }
-BPX_PREEXEC_FUNC=(func0 func1)
-
-function func2  { echo STOP; }
-function func3 { echo END; }
-BPX_PRECMD_FUNC=(func2 func3)
-```
-
-After typing a command like `echo hello world!` you can see then:
+If you only wanna use *preread*, bind first the macro `\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5` to a key seq like in `bind 'C-j: "macro"'`. Then make sure bpx has sane internal variables, when the next hook takes place:
 
 ```sh
-% echo hello world!
-BEGIN
-SPEAK
-hello world!
-STOP
-END
+# set bpx_var to 0
+PS1='${_[ bpx_var=0, 1 ]}\u@\h \w \$ '
+
+# increment bpx_var
+PS2='${_[ bpx_var+=1, 1 ]}> '
 ```
 
-Now let's use all of the keys from `BPX_PROMPT` in `preexec`
+If you only wanna use *postread*, bind the follwing macro like in `bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x3\C-x\C-x5\C-x\C-x6"` and reset *bpx_var*.
+
+And in order to define both, run `bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6"`.
+
+In summary (lol):
+
+- *preread*: `\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5`
+- *postread*: `\C-x\C-x1\C-x\C-x2\C-x\C-x3\C-x\C-x5\C-x\C-x6`
+- *both*: `\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6`
+
+### preexec and precmd
+
+If you really desire *preexec*, set the *DEBUG trap* like `trap __bpx_preexec DEBUG`. Then play around with the following settings:
 
 ```sh
-function func4 {
-    for i in "${!BPX_PROMPT[@]}"
-    do
-        printf '\t%s -> %s\n' "$i" "${BPX_PROMPT[$i]}"
-    done
-    printf '\r'
+shopt -s extdebug
+set +o functrace
+set +o errtrace
+```
+*precmd* can be used, for example, like so: `PROMPT_COMMAND=__bpx_precmd`. If you define *PROMPT_COMMAND* in a different way, make sure *precmd* functions have access to the *?* parameter to work properly. Your other things belonging to *PROMPT_COMMAND* can be executed by doing:
+
+```sh
+function _my_stuff {
+    ...
 }
 
-BPX_PREEXEC_FUNC+=(func4)
+precmd_functions=(_my_stuff)
 ```
 
-After typing the command `true` I get:
+## EXAMPLE
+
+The following test configuration makes use of all hook mechanisms and *extdebug*; it's also appended to *bpx.bash*. Comment it out and test it like:
 
 ```sh
-% true
-BEGIN
-SPEAK
-    ! -> 1447
-    unixtime -> 1475509325
-    @ -> 04:42 PM
-    A -> 16:42
-    T -> 04:42:05
-    d -> Mon Oct 03
-    t -> 16:42:05
-STOP
-END
+env -i INPUTRC=/dev/null TERM=$TERM HISTFILE=/tmp/bash_history~ bash --rcfile bpx.bash -i
 ```
 
-###### Setting PS{1..4}
-
-The best way to customize the prompt, is to set its variables in a function:
+Type and abort some simple and complex commands (with aliases and history expansion), let it read empty lines on the primary and secondary prompt. You will also see, that *preread* and *postread* never print below the old and new prompt respectively.
 
 ```sh
-function __prompt_command {
-    PS1='\t \$ '
-    PS2='> '
-}
+# At first, guarantee some options to be set.
+set -o emacs
+set -o histexpand
+set -o history
+shopt -s cmdhist
+shopt -s expand_aliases
+shopt -s promptvars
 
-BPX_PRECMD_FUNC[0]=__prompt_command
-```
+# Then we define four hook functions:
+function preread {
+    typeset s=$?
 
-###### Using the history
+    # The following strings will be shown over your prompt.
+    tput setaf 1
+    printf "%sPREREAD%s\nlast def of READLINE_LINE was:\n\t<%s>\n" \
+        -- -- "$READLINE_LINE"
+    printf "last def of READLINE_POINT was:\n\t<%d>\n" "$READLINE_POINT"
+    tput sgr0
 
-The history thing in Bash depends really on your configuration. In both mechanisms you can get the commands from the line by running `history 1` and expand the prompt strings `\#` and `\!`. In `preexec` you may also use the key `BPX_PROMPT[!]`. Remember, that `preexec` functions will be executed in a subshell and cannot be passed directly to `precmd` functions.
+    # Define also array *rl3*. Also usable in *preexec*
+    '__bpx_define_rl3';
 
-```sh
-function func4 {
-    read -r my_command < <(
-        fc -ln "${BPX_PROMPT[\!]}" "${BPX_PROMPT[\!]}"
+    # Some strings shall be printed under your prompt. To achieve this, we
+    # assign the *PSO* parameter (see below). We cannot set *PSO* directly in
+    # *preread*, so let's use a workaround.
+    ps0=$(
+        tput setaf 2
+        printf "%sps0%s\nlast status code was:\n\t<%d>\n" -- -- $s
+
+        # Print what has been typed on the prompt. Go and reference *rl{1,2,3}*.
+
+        printf "%s\n" rl1:
+        for i in "${!rl1[@]}"; do
+            printf '\tln %d := <%s>\n' "$i" "${rl1[i]}"
+        done
+
+        # Remove first indentation level, which is always (?) four spaces.
+        printf "%s\n" rl2:
+        for i in "${!rl2[@]}"; do
+            printf '\tln %d := <%s>\n' "$i" "${rl2[i]/????/}"
+        done
+
+        printf "%s\n" rl3:
+        for i in "${!rl3[@]}"; do
+            printf '\tword %d := <%s>\n' "$i" "${rl3[i]}"
+        done
+
+        # Make sure bash doesn't make silly rubbish.
+        printf 'output:\n\r'
+
+        tput sgr0
     );
+};
+function preexec {
+    tput setaf 3
 
-    read -r _ my_line < <(
-        HISTTIMEFORMAT= history 1
-    );
-}
+    printf '%sPREEXEC%s\n\thist 1 is: <%s>\n' -- -- "$histcmd"
+    printf '\tbash_cmd is: <%s>\n' "$BASH_COMMAND"
+    printf '\tlength of rl{1,2,3}: <%d> <%d> <%d>\n' \
+        "${#rl1[@]}" "${#rl2[@]}" "${#rl3[@]}"
 
-function func5 {
-echo "I typed '${my_line}', but it is an alias in my conf file.
-I could check that by comparing \${BASH_ALIASES[\${my_line}]}, which is '${BASH_ALIASES[${my_line}]}', with 'alias ${my_line}' ($(alias ls)).
+    tput sgr0
+};
+function precmd {
+    typeset s=$?
 
-PS: fc showed me, that '${BPX_PROMPT[\!]}' is beeing mapped to '${my_command}'!
+    tput setaf 4
+    printf '%sPRECMD%s\nstatus code is:\n\t<%d>\n' -- -- $s
+    tput sgr0
+};
+function postread {
+    typeset s=$?
 
-PPS: Here is the output of '${my_line}':"
+    tput setaf 5
+    printf '%sPOSTREAD%s\nstatus code was really:\n\t<%d>\n' -- -- $s
 
-printf '%s\n\r'
-}
+    tput sgr0
+};
 
-BPX_PREEXEC_FUNC=(func4 func5)
+# Now put the functions into the arrays.
+preread_functions=(preread)
+preexec_functions=(preexec)
+precmd_functions=(precmd)
+postread_functions=(postread)
+
+# Turn on *preread* and *postread*. Use Control-j for them.
+bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6"'
+
+# Make sure internal variables are set on time, when using the macro. *ps0* is
+# used as helper in *preread*. Make also *PS0* a bit nicer for our test and put
+# a newline into *PS1* to see what happens.
+export PS1='${_[ ps0[1]=9999, bpx_var=0, 1 ]}--PS1--\n\u@\h \w \$ '
+export PS2='${bpx_var[ bpx_var+=1, 0 ]}> '
+export PS0='${ps0#9999}'
+
+# Make *precmd* running.
+PROMPT_COMMAND='__bpx_precmd'
+
+# Use smaller tabs, please.
+tabs -4
+
+# Define some aliases for the test:
+alias ls='ls -l'
+alias command='command '
+alias fgrep='grep -F'
+
+# In the end, run also *preexec*. Turn on the extended debugging mode. Let's
+# see what is gonna happen.
+shopt -s extdebug
+trap __bpx_preexec DEBUG
+# set +o functrace
+# set +o errtrace
 ```
 
-My output after typing `ls`:
+## NOTICE
 
-```sh
-% ls
-I typed 'ls', but it is an alias in my conf file.
-I could check that by comparing ${BASH_ALIASES[${my_line}]}, which is 'ls -h --color=auto', with 'alias ls' (alias ls='ls -h --color=auto').
+bpx has been written on [Debian GNU/Linux stretch/sid (4.8.11-1 x86-64)](https://www.debian.org) in/with [GNU bash 4.4.5(1)-release](http://www.gnu.org/software/bash/).
 
-PS: fc showed me, that '1449' is beeing mapped to 'ls'!
-
-PPS: Here is the output of 'ls':
-
-README.md  bpx.bash
-```
-
-###### Setting PS0 via `precmd`
-
-Say, we want to reset `PS0` in an interactive session, because the default value isn't good enough or we need to react on our `precmd` functions.
-
-```sh
-function reset_ps0 {
-    if ((BPX_ERR > 0))
-    then
-        echo resetting PS0
-        PS0='Nice try\n'${BPX_PS0_DEFAULT}
-    else
-        PS0=$BPX_PS0_DEFAULT
-    fi
-}
-
-BPX_PRECMD_FUNC+=(reset_ps0)
-
-function use_my_own {
-    ((USE_MY_OWN)) || {
-        PS0=$(sed -n '/# 0/,/# 0/d;p' <<< "$BPX_PS0_DEFAULT");
-        USE_MY_OWN=1
-    }
-}
-
-BPX_PRECMD_FUNC[0]=use_my_own
-```
-
-###### Don't wanna use `preexec` at all
-
-Just unset or edit PS0. You may switch it on again by setting `PS0=$BPX_PS0_DEFAULT`.
-
-###### Don't wanna use `precmd` at all
-
-Just unset or edit PROMPT_COMMAND. You may switch it on again by setting it to `PROMPT_COMMAND=$BPX_PROMPT_COMMAND_DEFAULT`.
-
-###### Wanna reload bpx without sourcing
-
-These lines unset also your BPX_PRE{CMD,EXEC}_FUNC arrays.
-
-```sh
-PROMPT_COMMAND=$BPX_PROMPT_COMMAND_ORIG
-PS0=$BPX_PS0_ORIG
-unset -v BPX_ERR
-__bpx_main
-```
-
-##### NOTICE
-
-bpx has been written in [GNU bash 4.4.0(1)-release](http://www.gnu.org/software/bash/) on [Debian GNU/Linux 9 (stretch/sid)](https://www.debian.org).
-
-##### LICENCE
+## LICENCE
 
 GNU GPLv3
