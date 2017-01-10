@@ -40,7 +40,23 @@ A hook function executes functions in an array, which has the same name as the f
 3. *precmd* works with the *PROMPT_COMMAND* variable and is executed before each prompting of the primary prompt (*PS1*).
 4. *postread* is executed in a "keyseq:shell-command" binding after the readline-function *accept-line* has been executed. There is access to the status code of the most recently executed command line (like *precmd* has).
 
-In *preread* (and then also in *preexec*) you can use the function *__bpx_define_rl3* to get a third indexed array variable: *rl3* points to the command line that will be executed (like *rl2*), but each index only points to one word.
+In *preread* (and then also in *preexec*) you can use the function *__bpx_define_rl3* to get a third indexed array variable: *rl3* holds the command line that will be executed (like *rl2*), but each index only points to one word.
+
+bpx sets also the following global variables:
+
+```
+bpx_var
+    Integer attributed indexed array variable
+    [0] number of the current input line; if gt zero, we are using the
+        secondary prompt
+    [1] is one when complete command line has been read (no PS2 anymore)
+    [2] number of *BASH_COMMAND* in a command line
+    [3] last status code
+
+rl0
+    Normal scalar variable. Used to see, whether an input line has been
+    history expanded.
+```
 
 ### preread and postread
 
@@ -75,13 +91,20 @@ In summary (lol):
 
 ### preexec and precmd
 
-If you really desire *preexec*, set the *DEBUG trap* like `trap __bpx_preexec DEBUG`. Then play around with the following settings:
+If you really desire *preexec*, set the *DEBUG trap* like `trap __bpx_preexec DEBUG`. Then play around with the following settings
 
 ```sh
 shopt -s extdebug
 set +o functrace
 set +o errtrace
 ```
+
+and reset *bpx_var[2]* to zero
+
+```sh
+PS1='${_[ bpx_var[2]=0, 1 ]}\u@\h \w \$ '
+```
+
 *precmd* can be used, for example, like so: `PROMPT_COMMAND=__bpx_precmd`. If you define *PROMPT_COMMAND* in a different way, make sure *precmd* functions have access to the *?* parameter to work properly. Your other things belonging to *PROMPT_COMMAND* can be executed by doing:
 
 ```sh
@@ -94,10 +117,10 @@ precmd_functions=(_my_stuff)
 
 ### Notice
 
-If you started the session with *preexec* and *preread*/*postread* and you want to disable *preread*/*postread* in the same session, do this: unbind your key or key sequence and disable *bpx_var[2]*:
+If you started the session with *preexec* and *preread*/*postread* and you want to disable *preread*/*postread* in the same session, do this: rebind/unbind your key or key sequence and unset *bpx_var[3]*:
 
 ```sh
-unset -v bpx_var[2]
+unset -v bpx_var[3]
 ```
 
 ## EXAMPLE
@@ -213,7 +236,7 @@ bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6"'
 # Make sure internal variables are set on time, when using the macro. *ps0* is
 # used as helper in *preread*. Make also *PS2* a bit nicer for our test and put
 # a newline into *PS1* to see what happens.
-export PS1='${_[ ps0=9999, bpx_var=0, 1 ]}--PS1--\n\u@\h \w \$ '
+export PS1='${_[ ps0=9999, bpx_var=0, bpx_var[2]=0, 1 ]}--PS1--\n\u@\h \w \$ '
 export PS2='${bpx_var[ bpx_var+=1, 0 ]}> '
 export PS0='${ps0#9999}'
 

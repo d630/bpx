@@ -58,7 +58,7 @@ function __bpx_preexec {
     # Test, if *preread* and/or *postread* is hooking.
     # To avoid subshells, test also: 'BASHPID' -ne "$$"
     if
-        [[ -v bpx_var[2] ]];
+        [[ -v bpx_var[3] ]];
     then
         [[
             'bpx_var[1]' -eq 0 ||
@@ -87,21 +87,19 @@ function __bpx_preexec {
             'return' '0';;
     esac;
 
-    'typeset' \
-        '__' \
-        'histcmd';
+    bpx_var[2]+='1';
 
     # TODO(D630): HISTCMD and parameter transformation of \! expands always to
     # one, when they are running in a trap.
     # h='\!';
     # h="${h@P}";
-    #
-    # TODO(D630): Actually, we should run *history* only once per command line.
-    [[ "$SHELLOPTS" == *'history'* ]] && {
+    [[ 'bpx_var[2]' -eq 1 && "$SHELLOPTS" == *'history'* ]] && {
         IFS=$' \t' 'read' '-r' '_' 'histcmd' < <(
             HISTTIMEFORMAT= 'history' '1'
         );
     };
+
+    'typeset' '__';
 
     for __ in "${preexec_functions[@]}"; do
         1>'/dev/null' 'typeset' '-F' "$__" ||
@@ -121,7 +119,7 @@ function __bpx_preread {
         1>'/dev/null' 'typeset' '-F' "$__" ||
             'continue';
 
-        '__bpx_return' "${bpx_var[2]}";
+        '__bpx_return' "${bpx_var[3]}";
 
         bpx_var='' "$__" ||
             'break';
@@ -133,7 +131,7 @@ function __bpx_define_rl3 {
 };
 
 function __bpx_read_line {
-    bpx_var[bpx_var[1]=0,2]="$?";
+    bpx_var[bpx_var[1]=0,3]="$?";
 
     # If line buffer is empty, then test also, whether we're in the primary or
     # secondary prompt.
@@ -195,18 +193,20 @@ function __bpx_main {
     # 0 number of the current input line; if gt zero, we are using the
     #   secondary prompt
     # 1 is one when complete command line has been read (no PS2 anymore)
-    # 2 last status code
+    # 2 number of *BASH_COMMAND* in a command line
+    # 3 last status code
     #
     # Don't mess around with it.
 
     'unset' '-v' \
+        'bpx_var' \
+        'histcmd' \
+        'postread_functions' \
+        'preread_functions' \
         'rl0' \
         'rl1' \
         'rl2' \
-        'rl3' \
-        'bpx_var' \
-        'postread_functions' \
-        'preread_functions';
+        'rl3';
 
     # 'unset' '-v' \
     #     'precmd_functions' \
@@ -216,16 +216,18 @@ function __bpx_main {
     #     'precmd_functions' \
     #     'preexec_functions';
 
-    'typeset' '-g' 'rl0';
+    'typeset' '-g' \
+        'histcmd' \
+        'rl0';
 
     'typeset' '-g' '-a' \
+        'postread_functions' \
+        'preread_functions' \
         'rl1' \
         'rl2' \
-        'rl3' \
-        'postread_functions' \
-        'preread_functions';
+        'rl3';
 
-    'typeset' '-g' '-a' '-i' 'bpx_var=(0 0)';
+    'typeset' '-g' '-a' '-i' 'bpx_var=(0 0 0)';
 
     'bind' '-x' '"\C-x\C-x1": rl0="$READLINE_LINE";';
     'bind' '"\C-x\C-x2": history-expand-line';
@@ -344,7 +346,7 @@ function __bpx_main {
 # # Make sure internal variables are set on time, when using the macro. *ps0* is
 # # used as helper in *preread*. Make also *PS2* a bit nicer for our test and put
 # # a newline into *PS1* to see what happens.
-# export PS1='${_[ ps0=9999, bpx_var=0, 1 ]}--PS1--\n\u@\h \w \$ '
+# export PS1='${_[ ps0=9999, bpx_var=0, bpx_var[2]=0, 1 ]}--PS1--\n\u@\h \w \$ '
 # export PS2='${bpx_var[ bpx_var+=1, 0 ]}> '
 # export PS0='${ps0#9999}'
 
