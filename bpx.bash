@@ -53,15 +53,24 @@ function __bpx_precmd {
 };
 
 function __bpx_preexec {
-    [[
-        'BASHPID' -ne "$$" ||
-        'BASH_SUBSHELL' -gt 0 ||
-        'bpx_var[1]' -eq 0 ||
-        -n "$COMP_LINE" ||
-        -v READLINE_LINE ||
-        -z "${rl2[0]}"
-    ]] &&
-        'return' '0';
+    'set' '--' "$?";
+
+    # Test, if *preread* and/or *postread* is hooking.
+    # To avoid subshells, test also: 'BASHPID' -ne "$$"
+    if
+        [[ -v bpx_var[2] ]];
+    then
+        [[
+            'bpx_var[1]' -eq 0 ||
+            -v COMP_LINE ||
+            -v READLINE_LINE ||
+            -z "${rl2[0]}"
+        ]] &&
+            'return' '0';
+    else
+        [[ -v COMP_LINE || -v READLINE_LINE ]] &&
+            'return' '0';
+    fi;
 
     case "$BASH_COMMAND" in
         (''|'__bpx_postread'|'__bpx_precmd'|'__bpx_return')
@@ -86,7 +95,8 @@ function __bpx_preexec {
     # one, when they are running in a trap.
     # h='\!';
     # h="${h@P}";
-
+    #
+    # TODO(D630): Actually, we should run *history* only once per command line.
     [[ "$SHELLOPTS" == *'history'* ]] && {
         IFS=$' \t' 'read' '-r' '_' 'histcmd' < <(
             HISTTIMEFORMAT= 'history' '1'
@@ -97,7 +107,7 @@ function __bpx_preexec {
         1>'/dev/null' 'typeset' '-F' "$__" ||
             'continue';
 
-        '__bpx_return' "${bpx_var[2]}";
+        '__bpx_return' "$1";
 
         bpx_var='' histcmd="$histcmd" BASH_COMMAND="$BASH_COMMAND" "$__" ||
             'break';
@@ -215,7 +225,7 @@ function __bpx_main {
         'postread_functions' \
         'preread_functions';
 
-    'typeset' '-g' '-a' '-i' 'bpx_var=(0 0 0)';
+    'typeset' '-g' '-a' '-i' 'bpx_var=(0 0)';
 
     'bind' '-x' '"\C-x\C-x1": rl0="$READLINE_LINE";';
     'bind' '"\C-x\C-x2": history-expand-line';
@@ -287,10 +297,20 @@ function __bpx_main {
 #     );
 # };
 # function preexec {
+#     typeset s=$?
+
+#     # We are testing with *extdebug*. If you wanna avoid subshells, uncomment
+#     # this.
+#     #((BASHPID == $$)) ||
+#     #   return 0
+
 #     tput setaf 3
 
-#     printf '%sPREEXEC%s\n\thist 1 is: <%s>\n' -- -- "$histcmd"
+#     # You will see, that tabs and newlines are removed in the output, if
+#     # this function runs in a subshell.
+#     printf '%sPREEXEC%s\n\t$? is: <%d>\n' -- -- "$s"
 #     printf '\tbash_cmd is: <%s>\n' "$BASH_COMMAND"
+#     printf '\thist 1 is: <%s>\n' "$histcmd"
 #     printf '\tlength of rl{1,2,3}: <%d> <%d> <%d>\n' \
 #         "${#rl1[@]}" "${#rl2[@]}" "${#rl3[@]}"
 

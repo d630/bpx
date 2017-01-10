@@ -36,7 +36,7 @@ A hook function executes functions in an array, which has the same name as the f
 1. *preread* is executed in a "keyseq:shell-command" binding before the readline-function *accept-line* is called (*READLINE_{LINE,POINT}* available). The status code of the last command line execution is in the *?* parameter. Array functions have also access to two indexed array variables with different lengths:
     - *rl1* holds the strings that the user has typed (regardless of command history). If the index is greater than zero, the value holds a line, that was typed in on the secondary prompt (*PS2*);
     - *rl2* contains the full command line in the style of function definitions. Alias expansion is performed outside of command and process substitutions; history expansion is performed just once.
-2. *preexec* works with the *DEBUG trap* and is executed for every command in the command list (*BASH_COMMAND* available). It tries to suppresses traps in subshells and any tracing. If command history is active, the parameter *histcmd* holds the output of `HISTTIMEFORMAT= history 1` with the history number removed, otherwise it's the empty string. (**not recommended**)
+2. *preexec* works with the *DEBUG trap* and is executed for every command in the command list (*BASH_COMMAND* available). If command history is active, the parameter *histcmd* holds the output of `HISTTIMEFORMAT= history 1` with the history number removed, otherwise it's the empty string. (**not recommended**)
 3. *precmd* works with the *PROMPT_COMMAND* variable and is executed before each prompting of the primary prompt (*PS1*).
 4. *postread* is executed in a "keyseq:shell-command" binding after the readline-function *accept-line* has been executed. There is access to the status code of the most recently executed command line (like *precmd* has).
 
@@ -92,12 +92,21 @@ function _my_stuff {
 precmd_functions=(_my_stuff)
 ```
 
+### Notice
+
+If you started the session with *preexec* and *preread*/*postread* and you want to disable *preread*/*postread* in the same session, do this: unbind your key or key sequence and disable *bpx_var[2]*:
+
+```sh
+unset -v bpx_var[2]
+```
+
 ## EXAMPLE
 
 The following test configuration makes use of all hook mechanisms and *extdebug*; it's also appended to *bpx.bash*. Comment it out and test it like:
 
 ```sh
-env -i INPUTRC=/dev/null TERM=$TERM HISTFILE=/tmp/bash_history~ bash --rcfile bpx.bash -i
+env -i HOME=$HOME INPUTRC=/dev/null TERM=$TERM HISTFILE=/tmp/bash_history~ \
+    bash --rcfile bpx.bash -i
 ```
 
 Type and abort some simple and complex commands (with aliases and history expansion), let it read empty lines on the primary and secondary prompt. You will also see, that *preread* and *postread* never print below the old and new prompt respectively.
@@ -157,10 +166,20 @@ function preread {
     );
 };
 function preexec {
+    typeset s=$?
+
+    # We are testing with *extdebug*. If you wanna avoid subshells, uncomment
+    # this.
+    #((BASHPID == $$)) ||
+    #   return 0
+
     tput setaf 3
 
-    printf '%sPREEXEC%s\n\thist 1 is: <%s>\n' -- -- "$histcmd"
+    # You will see, that tabs and newlines are removed in the output, if
+    # this function runs in a subshell.
+    printf '%sPREEXEC%s\n\t$? is: <%d>\n' -- -- "$s"
     printf '\tbash_cmd is: <%s>\n' "$BASH_COMMAND"
+    printf '\thist 1 is: <%s>\n' "$histcmd"
     printf '\tlength of rl{1,2,3}: <%d> <%d> <%d>\n' \
         "${#rl1[@]}" "${#rl2[@]}" "${#rl3[@]}"
 
