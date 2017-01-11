@@ -101,9 +101,9 @@ bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6"'
 # Make sure internal variables are set on time, when using the macro. *ps0* is
 # used as helper in *preread*. Make also *PS2* a bit nicer for our test and put
 # a newline into *PS1* to see what happens.
-export PS1='${_[ ps0=9999, bpx_var=0, bpx_var[2]=0, 1 ]}--PS1--\n\u@\h \w \$ '
-export PS2='${bpx_var[ bpx_var+=1, 0 ]}> '
-export PS0='${ps0#9999}'
+PS1='${_[ ps0=9999, bpx_var=0, bpx_var[2]=0, 1 ]}--PS1--\n\u@\h \w \$ '
+PS2='${bpx_var[ bpx_var+=1, 0 ]}> '
+PS0='${ps0#9999}'
 
 # Make *precmd* running.
 PROMPT_COMMAND='__bpx_precmd'
