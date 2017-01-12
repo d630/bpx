@@ -10,50 +10,50 @@
 # -- FUNCTIONS.
 
 function __bpx_return {
-    'return' "${1:-0}";
+    return $1;
 };
 
 function __bpx_postread {
-    'set' '--' "$?";
+    set -- $?;
 
     ((bpx_var[1] && ${#rl1[@]})) ||
-        'return' "$1";
+        return $1;
 
-    'typeset' '__';
+    typeset __;
 
     for __ in "${postread_functions[@]}"; do
-        1>'/dev/null' 'typeset' '-F' "$__" ||
-            'continue';
+        1>/dev/null typeset -F "$__" ||
+            continue;
 
-        '__bpx_return' "$1";
+        __bpx_return $1;
 
-        bpx_var='' rl1='' rl2='' rl3='' "$__" ||
-            'break';
+        bpx_var= rl1= rl2= rl3= "$__" ||
+            break;
     done 1>&2;
 
-    'return' "$1";
+    return $1;
 };
 
 function __bpx_precmd {
-    'set' '--' "$?";
+    set -- $?;
 
-    'typeset' '__';
+    typeset __;
 
     for __ in "${precmd_functions[@]}"; do
-        1>'/dev/null' 'typeset' '-F' "$__" ||
-            'continue';
+        1>/dev/null typeset -F "$__" ||
+            continue;
 
-         '__bpx_return' "$1";
+         __bpx_return $1;
 
-        bpx_var='' rl1='' rl2='' rl3='' "$__" ||
-            'break';
+        bpx_var= rl1= rl2= rl3= "$__" ||
+            break;
     done;
 
-    'return' "$1";
+    return $1;
 };
 
 function __bpx_preexec {
-    'set' '--' "$?";
+    set -- $?;
 
     # Test, if *preread* and/or *postread* is hooking.
     # To avoid subshells, test also: 'BASHPID' -ne "$$"
@@ -61,98 +61,98 @@ function __bpx_preexec {
         [[ -v bpx_var[3] ]];
     then
         [[
-            'bpx_var[1]' -eq 0 ||
+            bpx_var[1] -eq 0 ||
             -v COMP_LINE ||
             -v READLINE_LINE ||
-            -z "${rl2[0]}"
+            -z "$rl2"
         ]] &&
-            'return' '0';
+            return 0;
     else
         [[ -v COMP_LINE || -v READLINE_LINE ]] &&
-            'return' '0';
+            return 0;
     fi;
 
-    case "$BASH_COMMAND" in
-        (''|'__bpx_postread'|'__bpx_precmd'|'__bpx_return')
-            'return' '0';;
+    case $BASH_COMMAND in
+        (''|__bpx_postread|__bpx_precmd|__bpx_return)
+            return 0;;
     esac;
 
-    case "${FUNCNAME[1]}" in
-        ('__bpx_postread'|'__bpx_precmd'|'__bpx_return')
-            'return' '0';;
+    case ${FUNCNAME[1]} in
+        (__bpx_postread|__bpx_precmd|__bpx_return)
+            return 0;;
     esac;
 
-    case "${FUNCNAME[2]}" in
-        ('__bpx_postread'|'__bpx_precmd'|'__bpx_return')
-            'return' '0';;
+    case ${FUNCNAME[2]} in
+        (__bpx_postread|__bpx_precmd|__bpx_return)
+            return 0;;
     esac;
 
-    bpx_var[2]+='1';
+    bpx_var[2]+=1;
 
     # TODO(D630): HISTCMD and parameter transformation of \! expands always to
     # one, when they are running in a trap.
     # h='\!';
     # h="${h@P}";
-    [[ 'bpx_var[2]' -eq 1 && "$SHELLOPTS" == *'history'* ]] && {
-        IFS=$' \t' 'read' '-r' '_' 'histcmd' < <(
-            HISTTIMEFORMAT='' 'history' '1';
+    [[ bpx_var[2] -eq 1 && $SHELLOPTS == *history* ]] && {
+        IFS=$' \t' read -r _ histcmd < <(
+            HISTTIMEFORMAT= history 1;
         );
     };
 
-    'typeset' '__';
+    typeset __;
 
     for __ in "${preexec_functions[@]}"; do
-        1>'/dev/null' 'typeset' '-F' "$__" ||
-            'continue';
+        1>/dev/null typeset -F "$__" ||
+            continue;
 
-        '__bpx_return' "$1";
+        __bpx_return $1;
 
-        bpx_var='' histcmd="$histcmd" BASH_COMMAND="$BASH_COMMAND" "$__" ||
-            'break';
+        bpx_var= histcmd=$histcmd BASH_COMMAND=$BASH_COMMAND "$__" ||
+            break;
     done;
 };
 
 function __bpx_preread {
-    'typeset' '__';
+    typeset __;
 
     for __ in "${preread_functions[@]}"; do
-        1>'/dev/null' 'typeset' '-F' "$__" ||
-            'continue';
+        1>/dev/null typeset -F "$__" ||
+            continue;
 
-        '__bpx_return' "${bpx_var[3]}";
+        __bpx_return ${bpx_var[3]};
 
-        bpx_var='' "$__" ||
-            'break';
+        bpx_var= "$__" ||
+            break;
     done 1>&2;
 };
 
 function __bpx_define_rl3 {
-    IFS=$' \t\n' 'read' '-r' '-d' '' '-a' 'rl3' <<< "${rl2[@]}";
+    IFS=$' \t\n' read -r -d '' -a rl3 <<< "${rl2[@]}";
 };
 
 function __bpx_read_line {
-    bpx_var[bpx_var[1]=0,3]="$?";
+    bpx_var[bpx_var[1]=0,3]=$?;
 
     # If line buffer is empty, then test also, whether we're in the primary or
     # secondary prompt.
     ((${#rl0})) || {
-        (((bpx_var[0]-=1) < 0)) &&
+        (((bpx_var-=1) < 0)) &&
             rl1=();
 
-        'return' '1';
+        return 1;
     };
 
     # Test, if history expansion has been performed.
-    [[ "$rl0" == "$READLINE_LINE" ]] || {
-        bpx_var='bpx_var[0]-=1';
+    [[ $rl0 == "$READLINE_LINE" ]] || {
+        bpx_var=bpx_var-=1;
 
-        READLINE_LINE="$rl0";
+        READLINE_LINE=$rl0;
 
-        'return' '1';
+        return 1;
     };
 
     if
-        ((bpx_var[0]));
+        ((bpx_var));
     then
         rl1+=("$rl0");
     else
@@ -168,24 +168,24 @@ function __bpx_read_line {
     # One solution is to say: if the user calls keyseq x while in the secondary
     # prompt, then the command line is completed; if she calls keyseq y, then
     # we expect to read the next input line and to stay in the sec prompt.
-    'mapfile' '-t' '-s' '2' 'rl2' < <(
+    mapfile -t -s 2 rl2 < <(
         IFS=$'\n';
 
-        # '.'  '/dev/stdin' <<< "
-        'eval' "
+        # .  /dev/stdin <<< "";
+        eval "
             function f {
                 ${rl1[*]}
             } &&
-                'typeset' '-f' 'f';
-        " 2>'/dev/null';
+                typeset -f f;
+        " 2>/dev/null;
     );
 
     ((${#rl2[@]})) ||
-        'return' '1';
+        return 1;
 
-    'unset' '-v' rl2[-1];
+    unset -v rl2[-1];
 
-    bpx_var[1]='1';
+    bpx_var[1]=1;
 };
 
 function __bpx_main {
@@ -198,53 +198,53 @@ function __bpx_main {
     #
     # Don't mess around with it.
 
-    'unset' '-v' \
-        'bpx_var' \
-        'histcmd' \
-        'postread_functions' \
-        'preread_functions' \
-        'rl0' \
-        'rl1' \
-        'rl2' \
-        'rl3';
+    unset -v \
+        bpx_var \
+        histcmd \
+        postread_functions \
+        preread_functions \
+        rl0 \
+        rl1 \
+        rl2 \
+        rl3;
 
-    # 'unset' '-v' \
-    #     'precmd_functions' \
-    #     'preexec_functions';
+    # unset -v \
+    #     precmd_functions \
+    #     preexec_functions;
 
-    # 'typeset' '-g' '-a' \
-    #     'precmd_functions' \
-    #     'preexec_functions';
+    # typeset -g -a \
+    #     precmd_functions \
+    #     preexec_functions;
 
-    'typeset' '-g' \
-        'histcmd' \
-        'rl0';
+    typeset -g \
+        histcmd \
+        rl0;
 
-    'typeset' '-g' '-a' \
-        'postread_functions' \
-        'preread_functions' \
-        'rl1' \
-        'rl2' \
-        'rl3';
+    typeset -g -a \
+        postread_functions \
+        preread_functions \
+        rl1 \
+        rl2 \
+        rl3;
 
-    'typeset' '-g' '-a' '-i' 'bpx_var=(0 0 0)';
+    typeset -g -a -i bpx_var=(0 0 0);
 
-    'bind' '-x' '"\C-x\C-x1": rl0="$READLINE_LINE";';
-    'bind' '"\C-x\C-x2": history-expand-line';
+    bind -x '"\C-x\C-x1": rl0=$READLINE_LINE';
+    bind '"\C-x\C-x2": history-expand-line';
 
-    'bind' '-x' '"\C-x\C-x3": "'__bpx_read_line'"';
-    'bind' '-x' '"\C-x\C-x4": "'__bpx_read_line' && '__bpx_preread'"';
+    bind -x '"\C-x\C-x3": __bpx_read_line';
+    bind -x '"\C-x\C-x4": __bpx_read_line && __bpx_preread';
 
-    'bind' '"\C-x\C-x5": accept-line';
-    'bind' '-x' '"\C-x\C-x6": "'__bpx_postread'"';
+    bind '"\C-x\C-x5": accept-line';
+    bind -x '"\C-x\C-x6": __bpx_postread';
 };
 
 # -- MAIN.
 
-'__bpx_main';
+__bpx_main;
 
 # -- TEST CONFIGURATION
 
-# . ./test.bash;
+. src/bpx/test.bash;
 
 # vim: set ts=4 sw=4 tw=0 et :
