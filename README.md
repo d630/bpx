@@ -10,11 +10,11 @@ well as **preread** and **postread**.
 
 bpx is, though, still a hacky business, no doubt. But it remembers the real
 bahviour of zsh: preexec functions are executed after the command line (aka.
-command list) has been read and is about to be executed; they are **not**
-beeing executed before each command execution of the list. Actually, the second
-and third parameters of its functions don't even obtain the whole expansion;
-alias expansion in command and process substitution, for example, is not
-performed. That is: one command line, one preexec hook!
+command list or parse tree) has been read and is about to be executed; they are
+**not** beeing executed before each command execution of the list. Actually,
+the second and third parameters of its functions don't even obtain the whole
+expansion; alias expansion in command and process substitution, for example, is
+not performed. That is: one command line, one preexec hook!
 
 bpx works best in bash 4.4 (*PS0*) and has been tested with the emacs line
 editing mode in an interactive instance that was not running in an Emacs shell
