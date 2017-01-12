@@ -19,10 +19,10 @@ function __bpx_postread {
     ((bpx_var[1] && ${#rl1[@]})) ||
         return $1;
 
-    typeset __;
+    declare __;
 
     for __ in "${postread_functions[@]}"; do
-        1>/dev/null typeset -F "$__" ||
+        1>/dev/null declare -F "$__" ||
             continue;
 
         __bpx_return $1;
@@ -37,10 +37,10 @@ function __bpx_postread {
 function __bpx_precmd {
     set -- $?;
 
-    typeset __;
+    declare __;
 
     for __ in "${precmd_functions[@]}"; do
-        1>/dev/null typeset -F "$__" ||
+        1>/dev/null declare -F "$__" ||
             continue;
 
          __bpx_return $1;
@@ -99,10 +99,10 @@ function __bpx_preexec {
         );
     };
 
-    typeset __;
+    declare __;
 
     for __ in "${preexec_functions[@]}"; do
-        1>/dev/null typeset -F "$__" ||
+        1>/dev/null declare -F "$__" ||
             continue;
 
         __bpx_return $1;
@@ -113,10 +113,10 @@ function __bpx_preexec {
 };
 
 function __bpx_preread {
-    typeset __;
+    declare __;
 
     for __ in "${preread_functions[@]}"; do
-        1>/dev/null typeset -F "$__" ||
+        1>/dev/null declare -F "$__" ||
             continue;
 
         __bpx_return ${bpx_var[3]};
@@ -176,7 +176,7 @@ function __bpx_read_line {
             function f {
                 ${rl1[*]}
             } &&
-                typeset -f f;
+                declare -f f;
         " 2>/dev/null;
     );
 
@@ -212,22 +212,22 @@ function __bpx_main {
     #     precmd_functions \
     #     preexec_functions;
 
-    # typeset -g -a \
+    # declare -g -a \
     #     precmd_functions \
     #     preexec_functions;
 
-    typeset -g \
+    declare -g \
         histcmd \
         rl0;
 
-    typeset -g -a \
+    declare -g -a \
         postread_functions \
         preread_functions \
         rl1 \
         rl2 \
         rl3;
 
-    typeset -g -a -i bpx_var=(0 0 0);
+    declare -g -a -i bpx_var=(0 0 0);
 
     bind -x '"\C-x\C-x1": rl0=$READLINE_LINE';
     bind '"\C-x\C-x2": history-expand-line';
@@ -245,6 +245,6 @@ __bpx_main;
 
 # -- TEST CONFIGURATION
 
-. src/bpx/test.bash;
+# . src/bpx/test.bash;
 
 # vim: set ts=4 sw=4 tw=0 et :
