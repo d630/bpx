@@ -20,7 +20,7 @@ function preread {
     tput sgr0
 
     # Define also array *rl3*. Also usable in *preexec*
-    '__bpx_define_rl3';
+    __bpx_define_rl3;
 
     # Some strings shall be printed below your prompt. To achieve this, we
     # assign the *PSO* parameter (see below). We cannot set *PSO* directly in
@@ -72,7 +72,11 @@ function preexec {
         "${#rl1[@]}" "${#rl2[@]}" "${#rl3[@]}"
 
     tput sgr0
-};
+
+    # if *extdebug* is on and you remove this redirection, you will get the
+    # diagnosis: "bash: $'\E[31m<:>': command not found" after commands like:
+    # : && $(:)
+} >/dev/tty;
 function precmd {
     typeset s=$?
 
@@ -99,14 +103,15 @@ postread_functions=(postread)
 bind 'C-j: "\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6"'
 
 # Make sure internal variables are set on time, when using the macro. *ps0* is
-# used as helper in *preread*. Make also *PS2* a bit nicer for our test and put
-# a newline into *PS1* to see what happens.
+# used as helper in *preread*. Make also *PS2* and *PS4* a bit nicer for our
+# test and put a newline into *PS1* to see what happens.
 PS1='${_[ ps0=9999, bpx_var=0, bpx_var[2]=0, 1 ]}--PS1--\n\u@\h \w \$ '
 PS2='${bpx_var[ bpx_var+=1, 0 ]}> '
 PS0='${ps0#9999}'
+PS4='+($?) ${BASH_SOURCE}:${FUNCNAME}:${LINENO}:'
 
 # Make *precmd* running.
-PROMPT_COMMAND='__bpx_precmd'
+PROMPT_COMMAND=__bpx_precmd
 
 # Use smaller tabs, please.
 tabs -4
