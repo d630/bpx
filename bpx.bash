@@ -93,11 +93,10 @@ function __bpx_preexec {
     # one, when they are running in a trap.
     # h='\!';
     # h="${h@P}";
-    [[ bpx_var[2] -eq 1 && $SHELLOPTS == *history* ]] && {
+    [[ bpx_var[2] -eq 1 && $SHELLOPTS == *history* ]] &&
         IFS=$' \t' read -r _ histcmd < <(
             HISTTIMEFORMAT= history 1;
         );
-    };
 
     declare __;
 
