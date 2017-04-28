@@ -1,20 +1,20 @@
-#### README
+### README
 
-[bpx](https://github.com/D630/bpx) is a bash shell procedure/script which
+[bpx](https://github.com/D630/bpx) is a bash shell procedure/script, which
 simulates the zsh hook functions **preexec** and **precmd**, (like
 [bash-preexec](https://github.com/rcaloras/bash-preexec)) but in an unsual
-manner: instead of doing the preexecution hook with the *DEBUG trap*, bpx
+manner: instead of doing the preexecution hook with the *DEBUG trap*, bpx also
 involves Readline by using the *bind* builtin command to work with the readline
-buffer. That's why bpx defines the hook functions *preexec* and *precmd* as
-well as **preread** and **postread**.
+buffer and to define the additional hook functions **preread** and
+**postread**.
 
 bpx is, though, still a hacky business, no doubt. But it remembers the real
-bahviour of zsh: preexec functions are executed after the command line (aka.
-command list or parse tree) has been read and is about to be executed; they are
-**not** beeing executed before each command execution of the list. Actually,
-the second and third parameters of its functions don't even obtain the whole
-expansion; alias expansion in command and process substitution, for example, is
-not performed. That is: one command line, one preexec hook!
+bahviour of zsh: preexec functions in zsh are executed after the command line
+(aka. command list or parse tree) has been read and is about to be executed;
+they are **not** beeing executed before each command execution of the list.
+Actually, the second and third parameters of its functions don't even obtain
+the whole expansion; alias expansion in command and process substitution, for
+example, is not performed. That is: one command line, one zsh like preexec hook!
 
 bpx works best in bash 4.4 (*PS0*) and has been tested with the emacs line
 editing mode in an interactive instance that was not running in an Emacs shell
@@ -24,12 +24,12 @@ of course.
 
 ![](https://raw.githubusercontent.com/D630/bpx/master/bpx.gif)
 
-#### BUGS & REQUESTS
+### BUGS & REQUESTS
 
 Feel free to open an issue or put in a pull request on
 https://github.com/D630/bpx. See also the comments in the script.
 
-#### GIT
+### GIT
 
 To download the very latest source code:
 
@@ -44,13 +44,13 @@ cd -- ./bpx
 git checkout $(git describe --abbrev=0 --tags)
 ```
 
-#### INSTALL
+### INSTALL
 
 Just put *bpx.bash* elsewhere on your *PATH* and then execute it with `.` or
 `source` in your configuraton file for interactive bash sessions (usually
 *.bashrc*).
 
-#### HOOKS
+### HOOKS
 
 A hook function executes functions in an array, which has the same name as the
 function + "_functions" appended (like "preread_functions"). All functions
@@ -101,9 +101,9 @@ bpx sets also some global variables for internal purposes:
 | ""[3] | last status code |
 | rl0 | Normal scalar variable. Used to see, whether an input line has been history expanded. |
 
-##### preread and postread
+#### preread and postread
 
-Internally, bpx binds six key sequences, which have to be bind as macro to
+Internally, bpx binds six key sequences, which have to be bound as macro to
 a key or key sequence of your choice:
 
 | Keyseq | Function |
@@ -143,7 +143,7 @@ In summary (lol):
 | postread | `\C-x\C-x1\C-x\C-x2\C-x\C-x3\C-x\C-x5\C-x\C-x6` |
 | both | `\C-x\C-x1\C-x\C-x2\C-x\C-x4\C-x\C-x5\C-x\C-x6` |
 
-##### preexec and precmd
+#### preexec
 
 If you really desire *preexec*, set the *DEBUG trap* like `trap __bpx_preexec
 DEBUG`. Then play around with the following settings
@@ -160,9 +160,11 @@ and reset *bpx_var[2]* to zero
 PS1='${_[ bpx_var[2]=0, 1 ]}\u@\h \w \$ '
 ```
 
+#### precmd
+
 *precmd* can be used, for example, like so: `PROMPT_COMMAND=__bpx_precmd`. If
 you define *PROMPT_COMMAND* in a different way, make sure *precmd* functions
-have access to the *?* parameter to work properly. Your other things belonging
+have access to the *?* parameter to work properly. Everything else belonging
 to *PROMPT_COMMAND* can be executed by doing:
 
 ```sh
@@ -177,35 +179,43 @@ precmd_functions=(_my_stuff)
 
 If you started the session with *preexec* and *preread*/*postread* and you want
 to disable *preread*/*postread* in the same session, do this: rebind/unbind
-your key or key sequence and unset *bpx_var[3]*:
+your key or key sequence and unset *bpx_var[3]* like
 
 ```sh
 unset -v bpx_var[3]
 ```
 
-#### EXAMPLE
+### EXAMPLE
 
 The [test configuration](../master/test.bash) makes use of all hook mechanisms
-and *extdebug*; test it like:
+and *extdebug*. Run bash like
 
 ```sh
-env -i HOME=$HOME INPUTRC=/dev/null TERM=$TERM HISTFILE=/tmp/bash_history~ \
+env -i \
+    HOME=$HOME \
+    INPUTRC=/dev/null \
+    TERM=$TERM \
+    HISTFILE=/tmp/bash_history~ \
     bash --rcfile bpx.bash -i
+```
 
+and execute the test file
+
+```sh
 . test.bash
 ```
 
-Type and abort some simple and complex commands (with aliases and history
+Then type and abort some simple and complex commands (with aliases and history
 expansion), let it read empty lines on the primary and secondary prompt. You
 will also see, that *preread* and *postread* never print below the old and new
 prompt respectively.
 
-#### NOTICE
+### NOTICE
 
 bpx has been written on [Debian GNU/Linux stretch/sid (4.8.11-1
 x86-64)](https://www.debian.org) in/with [GNU bash
 4.4.5(1)-release](http://www.gnu.org/software/bash/).
 
-#### LICENCE
+### LICENCE
 
 GNU GPLv3
