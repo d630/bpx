@@ -132,7 +132,7 @@ executed, the wrapper provides some functions and variables for them:
 | --- | --- | --- |
 | __bpx_command_line | Normal function | The body contains the full command line with aliases expanded outside of command and process substitutions |
 | __bpx_set_rl1 | Normal function | Assigns to *rl1* |
-| __bpx_set_rl2 | Normal function | Assign to *rl2*; implies *__bpx_set_rl1* |
+| __bpx_set_rl2 | Normal function | Assigns to *rl2*; implies *__bpx_set_rl1* |
 | __bpx_read_again | Normal function | Forces rereading and editing of the command line from start |
 | __bpx_read_abort | Normal function | Stops the editing and execution of the current command line |
 | __bpx_read_accept | Normal function | Undoes *__bpx_read_{again,abort}* |
@@ -142,7 +142,7 @@ executed, the wrapper provides some functions and variables for them:
 
 #### debug
 
-If you really desire *debug*, set the *DEBUG trap* like `trap __bpx_debug
+If you really desire *debug*, set the *DEBUG trap* like `trap __bpx_hook_debug
 DEBUG`. Then play around with the following settings
 
 ```sh
@@ -163,7 +163,7 @@ empty string.
 
 #### prompt
 
-*prompt* can be used, for example, like so: `PROMPT_COMMAND=__bpx_prompt`. If
+*prompt* can be used, for example, like so: `PROMPT_COMMAND=__bpx_hook_prompt`. If
 you define *PROMPT_COMMAND* in a different way, make sure *prompt* functions
 have access to the *?* parameter to work properly. Everything else belonging to
 *PROMPT_COMMAND* can be executed by doing:
