@@ -291,7 +291,8 @@ function __bpx_main {
         preread_functions \
         prompt_functions \
         rl0 \
-        rl1;
+        rl1 \
+        rl2;
 
     declare -g \
         histcmd \
