@@ -212,6 +212,12 @@ bpx has been written on [Debian GNU/Linux stretch/sid (4.9.0-2
 x86-64)](https://www.debian.org) in/with [GNU bash
 4.4.11(1)-release](http://www.gnu.org/software/bash/).
 
+bpx needs also the following programs/packages:
+
+- GNU coreutils 8.26: cat, chmod
+- GNU diffutils 3.5: cmp
+- Vi IMproved 8.0 (Included patches: 1-197, 322, 377-378, 550)
+
 ### LICENCE
 
 GNU GPLv3
