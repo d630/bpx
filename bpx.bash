@@ -243,8 +243,8 @@ function __bpx_read_line {
 
     # Test, if history expansion has been performed.
     [[ $rl0 != "$READLINE_LINE" && -o histexpand ]] &&
-            READLINE_LINE=$rl0 &&
-                return 1;
+        READLINE_LINE=$rl0 &&
+            return 1;
 
     #source <()
     #bash -n
