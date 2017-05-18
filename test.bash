@@ -8,7 +8,7 @@ shopt -s cmdhist
 shopt -s expand_aliases
 shopt -s promptvars
 
-# Then we define four hook functions:
+# Then we define five hook functions:
 
 function preread {
     typeset s=$?
@@ -88,13 +88,15 @@ function debug {
     # diagnosis: "bash: $'\E[31m<:>': command not found" after commands like:
     # : && $(:)
 } >/dev/tty;
-function promptf {
+
+function prompt {
     typeset s=$?
 
     tput setaf 5
     printf '%sPROMPT%s\nstatus code is:\n\t<%d>\n' -- -- $s
     tput sgr0
 };
+
 function postread {
     typeset s=$?
 
@@ -109,7 +111,7 @@ debug_functions=(debug)
 postread_functions=(postread)
 preexec_functions=(preexec)
 preread_functions=(preread)
-prompt_functions=(promptf)
+prompt_functions=(prompt)
 
 # Turn on *preread*, *preexec*, *postread*. Use Control-j for them.
 bind 'C-j: "\C-x\C-x1"'

@@ -86,7 +86,7 @@ a by-product, we are able to define some additional hooks:
 | 2 | preexec | bind | Executed in a "keyseq:shell-command" binding before the readline-function *accept-line* is invoked. *READLINE_{LINE,POINT}* may not be modified anymore |
 | 3 | debug | trap | Works with *DEBUG* and is executed for every command in the command list; *BASH_COMMAND* available (**not recommended**) |
 | 4 | prompt | variable | Works with the *PROMPT_COMMAND* variable and is executed before each prompting of the primary prompt (*PS1*) |
-| 5 | postread | bind | Executed in a "keyseq:shell-command" binding after the readline-function *accept-line* has been invoked |
+| 5 | postread | bind | Executed in a "keyseq:shell-command" binding after the readline-function *accept-line* has been invoked. *READLINE_{LINE,POINT}* of the next command line may be modified |
 
 Similar to zsh, those hook functions execute function names in an array, which
 has the same name as the hook + "_functions" appended: `preread_functions=(foo

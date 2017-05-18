@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# TODO(D630: finish etc.
+# TODO(D630): finish etc.
 
 # Don't forget to configure *PS1*!
 
@@ -91,7 +91,8 @@ ps1b='\#,\! \t';
 ps1c='\u@\h:\w';
 function postread3 {
 	ps1a="($?)";
-	tput sc; tput cup 0 0;
+	tput sc;
+	tput cup 0 0;
 	printf "${ps1a}%*s\n%s" "$((COLUMNS - ${#ps1a}))" "${ps1b@P}" "${ps1c@P}";
 	tput rc;
 };
@@ -104,5 +105,22 @@ function preexec4 {
 	ps0=wc:\ $(wc <<< "$rl0")$'\n\r';
 };
 preexec_functions=(preexec4);
+
+# Execute the command line, and after that put it again into the new buffer.
+function postread4 {
+	READLINE_LINE=$rl0;
+	READLINE_POINT=${#rl0};
+};
+postread_functions=(postread4);
+
+# If file is readable, replace the buffer with it, and reread the buffer.
+function preread6 {
+	[[ -r /tmp/file.sh ]] && {
+			READLINE_LINE=$(< /tmp/file.sh);
+			rm -f /tmp/file.sh;
+			__bpx_read_again;
+	};
+};
+preread_functions=(preread6);
 
 # vim: set ts=2 sw=2 tw=0 noet :
