@@ -159,11 +159,12 @@ function __bpx_edit {
 
 function __bpx_edit_and_execute_command {
     READLINE_LINE=$(
+        unset -v n;
         n=${TMPDIR:-/tmp}/bash-bpx.$RANDOM;
         printf '%s\n' "$rl0" > "$n";
         command chmod 600 "$n" > /dev/null 2>&1;
 
-        __bpx_edit "$n";
+        \__bpx_edit "$n";
 
         if
             command cmp -s <(printf '%s\n' "$rl0") "$n";
