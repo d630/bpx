@@ -2,7 +2,7 @@
 
 [bpx](https://github.com/D630/bpx) fakes a zsh-like hook function system for
 interactive bash shells by involving the *bind* builtin command to work with
-the readline buffer. See [Examples](../master/examples.bash).
+the readline buffer. See [Examples](../master/examples.bash) and [GIFS](#gifs).
 
 bpx works best in bash 4.4 (*PS0*) and has been tested with the emacs line
 editing mode in an interactive instance, that was not running in an Emacs shell
@@ -265,3 +265,11 @@ Optional is (see above):
 ### LICENCE
 
 GNU GPLv3
+
+### GIFS
+
+[![xhellcheck](https://asciinema.org/a/156996.png)](https://asciinema.org/a/156996)
+
+[![shfmt](https://asciinema.org/a/156997.png)](https://asciinema.org/a/156997)
+
+[![source-highlight](https://asciinema.org/a/156998.png)](https://asciinema.org/a/156998)
