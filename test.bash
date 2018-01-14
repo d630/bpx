@@ -15,9 +15,11 @@ function preread {
 
     # The following strings will be shown above your prompt.
     tput setaf 1
-    printf "%sPREREAD%s\nlast def of READLINE_LINE was:\n\t<%s>\n" \
-        -- -- "$READLINE_LINE"
-    printf "last def of READLINE_POINT was:\n\t<%d>\n" "$READLINE_POINT"
+    printf 'PREREAD\n'
+    printf "\tREADLINE_LINE:\n"
+    printf "\t\t<%s>\n" "$READLINE_LINE"
+    printf "\tREADLINE_POINT:\n"
+    printf "\t\t<%d>\n" "$READLINE_POINT"
     tput sgr0
 
     # Define also array *rl1* and *rl2*. Also usable elsewhere then
@@ -28,27 +30,30 @@ function preread {
     # assign the *PSO* parameter (see below). We cannot set *PSO* directly in
     # *preread*, so let's use a workaround.
     ps0=$(
-        tput setaf 2
-        printf '%sps0 (set in PREREAD)%s\nlast status code was:\n\t<%d>\n' -- -- $s
+        tput setaf 1
+
+        printf 'PS0 (set in PREREAD)\n'
+        printf '\t$?:\n'
+        printf '\t\t<%d>\n' $s
 
         # Print what has been typed on the prompt. Go and reference *rl{0,1,2}*.
 
-        printf "%s\n" rl0:
-        printf '\tln 0 := <%s>\n' "$rl0"
+        printf "\t%s\n" rl0:
+        printf '\t\tln 0 := <%s>\n' "$rl0"
 
         # Remove first indentation level, which is always (?) four spaces.
-        printf "%s\n" rl1:
+        printf "\t%s\n" rl1:
         for i in "${!rl1[@]}"; do
-            printf '\tln %d := <%s>\n' "$i" "${rl1[i]/????/}"
+            printf '\t\tln %d := <%s>\n' "$i" "${rl1[i]/????/}"
         done
 
-        printf "%s\n" rl2:
+        printf "\t%s\n" rl2:
         for i in "${!rl2[@]}"; do
-            printf '\tword %d := <%s>\n' "$i" "${rl2[i]}"
+            printf '\t\tword %d := <%s>\n' "$i" "${rl2[i]}"
         done
 
         # Make sure bash doesn\'t make silly rubbish.
-        printf 'output:\n\r'
+        printf '\tstdout + stderr:\n\r'
 
         tput sgr0
     );
@@ -57,10 +62,12 @@ function preread {
 function preexec {
     typeset s=$?
 
-    tput setaf 3
-    printf "%sPREEXEC%s\nlast def of READLINE_LINE was:\n\t<%s>\n" \
-        -- -- "$READLINE_LINE"
-    printf "last def of READLINE_POINT was:\n\t<%d>\n" "$READLINE_POINT"
+    tput setaf 2
+    printf "PREEXEC\n"
+    printf "\tREADLINE_LINE:\n" "$READLINE_LINE"
+    printf "\t\t<%s>\n" "$READLINE_LINE"
+    printf "\tREADLINE_POINT:\n" "$READLINE_POINT"
+    printf "\t\t<%d>\n" "$READLINE_POINT"
     tput sgr0
 };
 
@@ -72,15 +79,21 @@ function debug {
     #((BASHPID == $$)) ||
     #   return 0
 
-    tput setaf 4
+    tput setaf 3
 
     # You will see, that tabs and newlines are removed in the output, if
     # this function runs in a subshell.
-    printf '%sDEBUG%s\n\t$? is: <%d>\n' -- -- "$s"
-    printf '\tbash_cmd is: <%s>\n' "$BASH_COMMAND"
-    printf '\thist 1 is: <%s>\n' "$histcmd"
-    printf '\tlength of rl{0,1,2}: <%d> <%d> <%d>\n' \
-        "${#rl0}" "${#rl1[@]}" "${#rl2[@]}"
+    printf 'DEBUG\n'
+    printf '\t$?:\n'
+    printf '\t\t<%d>\n' $s
+    printf '\tBASH_COMMAND:\n'
+    printf '\t\t<%s>\n' "$BASH_COMMAND"
+    printf '\thistory 1:\n'
+    printf '\t\t<%s>\n' "$histcmd"
+    printf "\trl0:\n"
+    printf '\t\tln 0 := <%s>\n' "$rl0"
+    printf '\tlength of rl{0,1,2}:\n'
+    printf '\t\t<%d> <%d> <%d>\n' "${#rl0}" "${#rl1[@]}" "${#rl2[@]}"
 
     tput sgr0
 
@@ -93,7 +106,11 @@ function prompt {
     typeset s=$?
 
     tput setaf 5
-    printf '%sPROMPT%s\nstatus code is:\n\t<%d>\n' -- -- $s
+    printf 'PROMPT\n'
+    printf '\t$?:\n'
+    printf '\t\t<%d>\n' $s
+    printf "\trl0:\n"
+    printf '\t\tln 0 := <%s>\n' "$rl0"
     tput sgr0
 };
 
@@ -101,7 +118,11 @@ function postread {
     typeset s=$?
 
     tput setaf 6
-    printf '%sPOSTREAD%s\nstatus code was really:\n\t<%d>\n' -- -- $s
+    printf 'POSTREAD\n'
+    printf '\t$?:\n'
+    printf '\t\t<%d>\n' $s
+    printf "\trl0:\n"
+    printf '\t\tln 0 := <%s>\n' "$rl0"
 
     tput sgr0
 };

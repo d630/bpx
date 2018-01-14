@@ -51,7 +51,9 @@ function __bpx_hook_debug {
 
     bpx_var[2]+=1;
 
-    declare +x __;
+    declare +x \
+        __ \
+        rl0;
 
     # TODO(D630): HISTCMD and parameter transformation of \! expands always to
     # one, when they are running in a trap:
@@ -74,12 +76,16 @@ function __bpx_hook_debug {
 };
 
 function __bpx_hook_postread {
-    set -- $?;
+    set -- $? "$1";
 
     ((${#postread_functions[@]})) ||
         return $1;
 
-    declare +x __;
+    declare +x \
+        __ \
+        rl0;
+
+    rl0=$2;
 
     ((bpx_var[1] && ${#rl0})) ||
         return $1;
@@ -149,7 +155,9 @@ function __bpx_hook_prompt {
     ((${#prompt_functions[@]})) ||
         return $1;
 
-    declare +x __;
+    declare +x \
+        __ \
+        rl0;
 
     for __ in "${prompt_functions[@]}"; do
         > /dev/null declare -F "$__" ||
@@ -177,27 +185,49 @@ function __bpx_edit {
 };
 
 function __bpx_edit_and_execute_command {
-    set -- 0 1;
+    # set -- 0 1;
 
-    declare +x f;
-    f=${TMPDIR:-/tmp}/bash-bpx.$RANDOM;
-    printf '%s\n' "$rl0" > "$f";
-    command chmod 600 "$f" > /dev/null 2>&1;
+    # declare +x f;
+    # f=${TMPDIR:-/tmp}/bash-bpx.$RANDOM;
+    # printf '%s\n' "$rl0" > "$f";
+    # command chmod 600 "$f" > /dev/null 2>&1;
 
-    \__bpx_edit "$f";
+    # \__bpx_edit "$f";
 
-    if
-        command cmp -s <(printf '%s\n' "$rl0") "$f";
-    then
-        READLINE_LINE=$rl0;
-        shift 1;
-    else
-        READLINE_LINE=$(< "$f");
-    fi;
+    # if
+    #     command cmp -s <(printf '%s\n' "$rl0") "$f";
+    # then
+    #     READLINE_LINE=$rl0;
+    #     shift 1;
+    # else
+    #     READLINE_LINE=$(cat "$f" 2>&1);
+    # fi;
 
-    command rm -- "$f";
+    # command rm -- "$f" > /dev/null 2>&1;
 
-    return $1;
+    # return $1;
+
+    READLINE_LINE=$(
+        unset -v f;
+        f=${TMPDIR:-/tmp}/bash-bpx.$RANDOM;
+
+        printf '%s\n' "$rl0" > "$f";
+        command chmod 600 "$f" > /dev/null 2>&1;
+        \__bpx_edit "$f";
+
+        if
+            command cmp -s <(printf '%s\n' "$rl0") "$f";
+        then
+            printf '%s\n' "$rl0";
+            command rm -- "$f" > /dev/null 2>&1;
+            exit 1;
+        else
+            command cat "$f" 2>&1;
+            command rm -- "$f" > /dev/null 2>&1;
+            exit 0;
+        fi;
+    );
+
 };
 
 function __bpx_set_binds {
@@ -218,7 +248,7 @@ function __bpx_set_binds {
 
     bind '"\C-x\C-x7": "\C-x\C-x8\C-x\C-x9"';
     bind '"\C-x\C-x8": accept-line';
-    bind -x '"\C-x\C-x9": \__bpx_hook_postread';
+    bind -x '"\C-x\C-x9": \__bpx_hook_postread "$rl0"';
 };
 
 function __bpx_set_rl1 {
