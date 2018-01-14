@@ -58,11 +58,9 @@ function __bpx_hook_debug {
     # h='\!';
     # h="${h@P}";
     [[ bpx_var[2] -eq 1 && -o history ]] &&
-        histcmd=$(HISTTIMEFORMAT=$'\r                                                                                                                             \r' \
-            history 1);
-        # IFS=$' \t' read -r _ histcmd < <(
-        #     HISTTIMEFORMAT= history 1;
-        # );
+        IFS=$' \t' read -r _ histcmd < <(
+            HISTTIMEFORMAT= history 1;
+        );
 
     for __ in "${debug_functions[@]}"; do
         > /dev/null declare -F "$__" ||
@@ -111,6 +109,7 @@ function __bpx_hook_preexec {
 
     READLINE_LINE=;
     READLINE_POINT=;
+    rl0=$1;
 
     for __ in "${preexec_functions[@]}"; do
         > /dev/null declare -F "$__" ||
@@ -130,6 +129,8 @@ function __bpx_hook_preread {
     declare +x \
         __ \
         rl0;
+
+    rl0=$1;
 
     for __ in "${preread_functions[@]}"; do
         > /dev/null declare -F "$__" ||
@@ -208,8 +209,8 @@ function __bpx_set_binds {
     bind -x '"\C-x\C-x3": rl0=$READLINE_LINE';
     bind '"\C-x\C-x4": history-expand-line';
     bind -x '"\C-x\C-x5": \__bpx_read_line && {
-            \__bpx_hook_preread;
-            \__bpx_hook_preexec;
+            \__bpx_hook_preread "$rl0";
+            \__bpx_hook_preexec "$rl0";
         };
     ';
 
@@ -278,18 +279,19 @@ function __bpx_read_line {
         function __bpx_command_line {
             $rl0
         };
-    " 2> /dev/null ||
-        if
-            \__bpx_edit_and_execute_command;
-        then
-            \__bpx_read_again;
-            return 1;
-        else
-            \__bpx_read_abort;
-            return 1;
-        fi;
+    " 2> /dev/null &&
+        bpx_var[1]=1 &&
+            return 0;
 
-    bpx_var[1]=1;
+    if
+        \__bpx_edit_and_execute_command;
+    then
+        \__bpx_read_again;
+    else
+        \__bpx_read_abort;
+    fi;
+
+    return 1;
 };
 
 function __bpx_return {
