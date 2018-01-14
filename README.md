@@ -255,7 +255,7 @@ x86-64)](https://www.debian.org) in/with [GNU bash
 
 bpx needs also the following programs/packages:
 
-- GNU coreutils 8.28: chmod, rm
+- GNU coreutils 8.28: cat, chmod, rm
 - GNU diffutils 3.6: cmp
 
 Optional is (see above):

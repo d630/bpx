@@ -105,7 +105,7 @@ function debug {
 function prompt {
     typeset s=$?
 
-    tput setaf 5
+    tput setaf 4
     printf 'PROMPT\n'
     printf '\t$?:\n'
     printf '\t\t<%d>\n' $s
@@ -117,7 +117,7 @@ function prompt {
 function postread {
     typeset s=$?
 
-    tput setaf 6
+    tput setaf 5
     printf 'POSTREAD\n'
     printf '\t$?:\n'
     printf '\t\t<%d>\n' $s
