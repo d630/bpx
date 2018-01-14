@@ -268,8 +268,8 @@ GNU GPLv3
 
 ### GIFS
 
-[![xhellcheck](https://asciinema.org/a/156996.png)](https://asciinema.org/a/156996)
+[![shellcheck](https://asciinema.org/a/156996.png)](https://asciinema.org/a/156996)
 
 [![shfmt](https://asciinema.org/a/156997.png)](https://asciinema.org/a/156997)
 
-[![source-highlight](https://asciinema.org/a/156998.png)](https://asciinema.org/a/156998)
+[![source_highlight](https://asciinema.org/a/156998.png)](https://asciinema.org/a/156998)
