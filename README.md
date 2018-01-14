@@ -140,6 +140,47 @@ executed, the wrapper provides some functions and variables for them:
 | rl1 | Normal indexed array | Contains the body of *__bpx_command_line* |
 | rl2 | Normal indexed array | Contains the body of *__bpx_command_line*, but each index only points to one word (+ operator) |
 
+Thats is, if the typed command is
+
+```sh
+$ for i in 1; do ls; done;
+```
+
+then
+
+```sh
+$ printf '%s\n' "$rl0"
+for i in 1; do ls; done;
+
+$ declare -fp __bpx_command_line
+__bpx_command_line ()
+{
+    for i in 1;
+    do
+        /bin/ls -h --color=auto;
+    done
+}
+
+$ __bpx_set_rl2
+
+$ printf '%s\n' "${rl1[@]}"
+    for i in 1;
+    do
+        /bin/ls -h --color=auto;
+    done
+
+$ printf '%s\n' "${rl2[@]}"
+for
+i
+in
+1;
+do
+/bin/ls
+-h
+--color=auto;
+done
+```
+
 #### debug
 
 If you really desire *debug*, set the *DEBUG trap* like `trap __bpx_hook_debug
@@ -163,8 +204,8 @@ empty string.
 
 #### prompt
 
-*prompt* can be used, for example, like so: `PROMPT_COMMAND=__bpx_hook_prompt`. If
-you define *PROMPT_COMMAND* in a different way, make sure *prompt* functions
+*prompt* can be used, for example, like so: `PROMPT_COMMAND=__bpx_hook_prompt`.
+If you define *PROMPT_COMMAND* in a different way, make sure *prompt* functions
 have access to the *?* parameter to work properly. Everything else belonging to
 *PROMPT_COMMAND* can be executed by doing:
 
@@ -208,15 +249,18 @@ and execute the test file
 
 ### NOTICE
 
-bpx has been written on [Debian GNU/Linux stretch/sid (4.9.0-2
+bpx has been written on [Debian GNU/Linux buster/sid (4.14.0-2-amd64
 x86-64)](https://www.debian.org) in/with [GNU bash
-4.4.11(1)-release](http://www.gnu.org/software/bash/).
+4.4.12(1)-release](http://www.gnu.org/software/bash/).
 
 bpx needs also the following programs/packages:
 
-- GNU coreutils 8.26: cat, chmod
-- GNU diffutils 3.5: cmp
-- Vi IMproved 8.0 (Included patches: 1-197, 322, 377-378, 550)
+- GNU coreutils 8.28: chmod, rm
+- GNU diffutils 3.6: cmp
+
+Optional is (see above):
+
+- Vi IMproved 8.0 (Included patches: 1-1401)
 
 ### LICENCE
 
