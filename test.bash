@@ -29,12 +29,12 @@ function preread {
     # *preread*, so let's use a workaround.
     ps0=$(
         tput setaf 2
-        printf "%sps0%s\nlast status code was:\n\t<%d>\n" -- -- $s
+        printf '%sps0 (set in PREREAD)%s\nlast status code was:\n\t<%d>\n' -- -- $s
 
         # Print what has been typed on the prompt. Go and reference *rl{0,1,2}*.
 
         printf "%s\n" rl0:
-        printf '\tln 1 := <%s>\n' "$rl0"
+        printf '\tln 0 := <%s>\n' "$rl0"
 
         # Remove first indentation level, which is always (?) four spaces.
         printf "%s\n" rl1:
@@ -47,7 +47,7 @@ function preread {
             printf '\tword %d := <%s>\n' "$i" "${rl2[i]}"
         done
 
-        # Make sure bash doesn't make silly rubbish.
+        # Make sure bash doesn\'t make silly rubbish.
         printf 'output:\n\r'
 
         tput sgr0
