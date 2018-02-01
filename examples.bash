@@ -18,6 +18,7 @@ function preexec1 {
 };
 preexec_functions=(preexec1);
 
+
 # Copy the command line into the primary selection buffer.
 function preexec2 {
 	xsel \
@@ -27,11 +28,13 @@ function preexec2 {
 };
 preexec_functions=(preexec2);
 
+
 # Reformat the command line with shfmt.
 function preread1 {
 	READLINE_LINE=$(shfmt <<< "$rl0");
 };
 preread_functions=(preread1);
+
 
 # Change the command line into a function definition.
 function preread2 {
@@ -40,6 +43,7 @@ function preread2 {
 	__bpx_read_abort;
 };
 preread_functions=(preread2);
+
 
 # Show the command line as function and colorize it.
 function preread3 {
@@ -58,17 +62,20 @@ function preread3 {
 };
 preread_functions=(preread3);
 
+
 # Insert the reserved word *time*.
 function preread4 {
 	READLINE_LINE="time $rl0";
 };
 preread_functions=(preread4);
 
+
 # Make the command line verbose.
 function preexec3 { set -v; set -x; };
 function postread1 { set +v; set +x; };
 preexec_functions=(preexec3);
 postread_functions=(postread1);
+
 
 # Print a horizontal line above the prompt.
 function postread2 {
@@ -78,9 +85,11 @@ function postread2 {
 };
 postread_functions=(postread2);
 
+
 # Go to the Terminal's first line and clear screen before execution.
 function preread5 { tput cup 0 0; tput ed; };
 preread_functions=(preread5);
+
 
 # Fake a multiline prompt.
 bind 'set emacs-mode-string ""';
@@ -98,6 +107,7 @@ function postread3 {
 };
 postread_functions=(postread3 postread2);
 
+
 # Describe the command line with *wc*.
 PS0='${ps0#9999}';
 PS1='${_[ps0=9999, bpx_var=0, bpx_var[2]=0, 1]}\u@\h \w \$ ';
@@ -106,12 +116,14 @@ function preexec4 {
 };
 preexec_functions=(preexec4);
 
+
 # Execute the command line, and after that put it again into the new buffer.
 function postread4 {
 	READLINE_LINE=$rl0;
 	READLINE_POINT=${#rl0};
 };
 postread_functions=(postread4);
+
 
 # If file is readable, replace the buffer with it, and reread the buffer.
 function preread6 {
@@ -122,5 +134,13 @@ function preread6 {
 	};
 };
 preread_functions=(preread6);
+
+# Run single word command line with sudo, if it's a simple command from sbin
+function preread7
+case $(type -p "$rl0") in
+	(/usr/sbin/*|/sbin/*)
+		READLINE_LINE="sudo '$rl0'";;
+esac;
+preread_functions=(preread7);
 
 # vim: set ts=2 sw=2 tw=0 noet :
