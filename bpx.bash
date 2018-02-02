@@ -256,8 +256,6 @@ function __bpx_set_rl1 {
         declare -f __bpx_command_line 2> /dev/null;
     );
 
-    declare -f __bpx_command_line;
-
     ((${#rl1[@]})) ||
         return 1;
 

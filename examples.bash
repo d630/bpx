@@ -148,8 +148,7 @@ preread_functions=(preread7);
 function preread8 {
 	__bpx_set_rl2;
 
-	declare i exe p;
-	exe=0;
+	declare i p;
 
 	for i in "${!rl2[@]}";
 	do
@@ -160,7 +159,7 @@ function preread8 {
 			rl2[i]="sudo ${rl2[i]}";
 	done;
 
-	READLINE_LINE="# ${rl2[*]}";
+	READLINE_LINE=${rl2[*]};
 };
 preread_functions=(preread8);
 
