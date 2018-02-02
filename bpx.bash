@@ -256,6 +256,8 @@ function __bpx_set_rl1 {
         declare -f __bpx_command_line 2> /dev/null;
     );
 
+    declare -f __bpx_command_line;
+
     ((${#rl1[@]})) ||
         return 1;
 
@@ -311,7 +313,9 @@ function __bpx_read_line {
         };
     " 2> /dev/null &&
         bpx_var[1]=1 &&
-            return 0;
+            rl1=() &&
+                rl2=() &&
+                    return 0;
 
     if
         \__bpx_edit_and_execute_command;

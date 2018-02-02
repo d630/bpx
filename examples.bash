@@ -143,4 +143,25 @@ case $(type -p "$rl0") in
 esac;
 preread_functions=(preread7);
 
-# vim: set ts=2 sw=2 tw=0 noet :
+# Run cmds in command line with sudo, if it's a simple command from sbin.
+# Doesn't work with aliases already prepended with sudo.
+function preread8 {
+	__bpx_set_rl2;
+
+	declare i exe p;
+	exe=0;
+
+	for i in "${!rl2[@]}";
+	do
+		p=$(type -p -- "${rl2[i]%%[[:space:];]*}");
+		[[ -z $p ]] &&
+			continue;
+		[[ $p != *?(/)sudo && $p == ?(/usr)/sbin/?* ]] &&
+			rl2[i]="sudo ${rl2[i]}";
+	done;
+
+	READLINE_LINE="# ${rl2[*]}";
+};
+preread_functions=(preread8);
+
+# vim: set ft=sh :
