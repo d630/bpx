@@ -60,9 +60,8 @@ function __bpx_hook_debug {
     # h='\!';
     # h="${h@P}";
     [[ bpx_var[2] -eq 1 && -o history ]] &&
-        IFS=$' \t' read -r _ histcmd < <(
-            HISTTIMEFORMAT= history 1;
-        );
+        histcmd=$(HISTTIMEFORMAT=%n history 1) &&
+            histcmd=${histcmd#*$'\n'};
 
     for __ in "${debug_functions[@]}"; do
         > /dev/null declare -F "$__" ||
