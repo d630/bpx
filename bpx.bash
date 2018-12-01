@@ -60,8 +60,8 @@ function __bpx_hook_debug {
     # h='\!';
     # h="${h@P}";
     [[ bpx_var[2] -eq 1 && -o history ]] &&
-        histcmd=$(HISTTIMEFORMAT=%n history 1) &&
-            histcmd=${histcmd#*$'\n'};
+        histcmd=$(HISTTIMEFORMAT=%%; history 1) &&
+            histcmd=${histcmd#*%};
 
     for __ in "${debug_functions[@]}"; do
         > /dev/null declare -F "$__" ||
@@ -394,4 +394,4 @@ declare -fr \
 
 #. src/bpx/test.bash;
 
-# vim: set ts=4 sw=4 tw=0 et :
+# vim: set ft=sh :
