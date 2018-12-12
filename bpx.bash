@@ -211,17 +211,17 @@ function __bpx_edit_and_execute_command {
         f=${TMPDIR:-/tmp}/bash-bpx.$RANDOM;
 
         printf '%s\n' "$rl0" > "$f";
-        command chmod 600 "$f" > /dev/null 2>&1;
+        command chmod 600 -- "$f" > /dev/null 2>&1;
         \__bpx_edit "$f";
 
         if
-            command cmp -s <(printf '%s\n' "$rl0") "$f";
+            command cmp -s -- <(printf '%s\n' "$rl0") "$f";
         then
             printf '%s\n' "$rl0";
             command rm -- "$f" > /dev/null 2>&1;
             exit 1;
         else
-            command cat "$f" 2>&1;
+            command cat -- "$f" 2>&1;
             command rm -- "$f" > /dev/null 2>&1;
             exit 0;
         fi;
