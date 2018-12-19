@@ -365,6 +365,12 @@ function __bpx_main {
         rl1 \
         rl2;
 
+    debug_functions=();
+    postread_functions=();
+    preexec_functions=();
+    preread_functions=();
+    prompt_functions=();
+
     declare -g -a -i bpx_var;
     bpx_var=(0 0 0);
 
