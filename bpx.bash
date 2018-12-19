@@ -210,7 +210,7 @@ function __bpx_edit_and_execute_command {
         unset -v f;
         f=${TMPDIR:-/tmp}/bash-bpx.$RANDOM;
 
-        printf '%s\n' "$rl0" > "$f";
+        printf '%s\n' "$rl0" >| "$f";
         command chmod 600 -- "$f" > /dev/null 2>&1;
         \__bpx_edit "$f";
 
