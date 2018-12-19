@@ -184,28 +184,6 @@ function __bpx_edit {
 };
 
 function __bpx_edit_and_execute_command {
-    # set -- 0 1;
-
-    # declare +x f;
-    # f=${TMPDIR:-/tmp}/bash-bpx.$RANDOM;
-    # printf '%s\n' "$rl0" > "$f";
-    # command chmod 600 "$f" > /dev/null 2>&1;
-
-    # \__bpx_edit "$f";
-
-    # if
-    #     command cmp -s <(printf '%s\n' "$rl0") "$f";
-    # then
-    #     READLINE_LINE=$rl0;
-    #     shift 1;
-    # else
-    #     READLINE_LINE=$(cat "$f" 2>&1);
-    # fi;
-
-    # command rm -- "$f" > /dev/null 2>&1;
-
-    # return $1;
-
     READLINE_LINE=$(
         unset -v f;
         f=${TMPDIR:-/tmp}/bash-bpx.$RANDOM;
