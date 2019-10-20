@@ -1,10 +1,10 @@
 ### README
 
 [bpx](https://github.com/D630/bpx) fakes a zsh-like hook function system for
-interactive bash shells by involving the *bind* builtin command to work with
+interactive bash shells. It works with the *bind* builtin command to modify
 the readline buffer. See [Examples](../master/examples.bash) and [GIFS](#gifs).
 
-bpx works best in bash 4.4 (*PS0*) and has been tested with the emacs line
+bpx works best in bash >=4.4 (*PS0*) and has been tested with the emacs line
 editing mode in an interactive instance, that was not running in an Emacs shell
 buffer. Please let me know, how to do it with the vi mode (which is, btw, also
 the POSIX line editing mode). bash must run without its *--noediting* option,
@@ -54,7 +54,7 @@ bash sessions (usually *.bashrc*).
 
 Bash is able to handle signals and other conditions (*trap*), to invoke the
 function *command_not_found_handle*, and to expand special variables at special
-times (*prompting*). But it has no "real" hooking mechanism like you can see
+times (*prompting*). But it has no "real" hook mechanism like you can see
 working in [tcsh's special aliases](http://www.tcsh.org), in [zsh's hook
 functions](http://zsh.sourceforge.net/Doc/Release/Functions.html#Hook-Functions)
 or [fish's event
@@ -83,7 +83,7 @@ a by-product, we are able to define some additional hooks:
 | Order | Hook | Method | Description |
 | --- | --- | --- | --- |
 | 1 | preread | bind | Executed in a "keyseq:shell-command" binding before the readline-function *accept-line* is invoked. *READLINE_{LINE,POINT}* may be modified |
-| 2 | preexec | bind | Executed in a "keyseq:shell-command" binding before the readline-function *accept-line* is invoked. *READLINE_{LINE,POINT}* may not be modified anymore |
+| 2 | preexec | bind | Executed in a "keyseq:shell-command" binding before the readline-function *accept-line* is invoked. *READLINE_{LINE,POINT}* may not be read and modified anymore |
 | 3 | debug | trap | Works with *DEBUG* and is executed for every command in the command list; *BASH_COMMAND* available (**not recommended**) |
 | 4 | prompt | variable | Works with the *PROMPT_COMMAND* variable and is executed before each prompting of the primary prompt (*PS1*) |
 | 5 | postread | bind | Executed in a "keyseq:shell-command" binding after the readline-function *accept-line* has been invoked. *READLINE_{LINE,POINT}* of the next command line may be modified |
@@ -117,8 +117,7 @@ of your choice:
 bind 'C-j: "\C-x\C-x1"'
 ```
 
-Then make sure bpx has sane internal variables, when the next hooking takes
-place:
+Then make sure bpx has sane internal variables, when the next hook takes place:
 
 ```sh
 # set bpx_var to 0
@@ -249,7 +248,7 @@ and execute the test file
 
 ### NOTICE
 
-bpx has been written on [Debian GNU/Linux buster/sid (4.14.0-2-amd64
+bpx has been written and tested on [Debian GNU/Linux buster/sid (4.14.0-2-amd64
 x86-64)](https://www.debian.org) in/with [GNU bash
 4.4.12(1)-release](http://www.gnu.org/software/bash/).
 

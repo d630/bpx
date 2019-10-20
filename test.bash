@@ -61,7 +61,7 @@ function preread {
 
 function preexec {
     typeset s=$?
-
+    declare -p READLINE_LINE READLINE_POINT
     tput setaf 2
     printf "PREEXEC\n"
     printf "\tREADLINE_LINE:\n" "$READLINE_LINE"
