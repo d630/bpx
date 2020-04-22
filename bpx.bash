@@ -171,7 +171,6 @@ function __bpx_hook_prompt {
 	return "$1";
 };
 
-
 ## -- MISC.
 
 function __bpx_command_line case . in esac;
@@ -204,7 +203,6 @@ function __bpx_edit_and_execute_command {
 			exit 0;
 		fi;
 	);
-
 };
 
 function __bpx_set_binds {
