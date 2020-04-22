@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # bpx -- bash-pre-execution
-# Copyright (C) 2015,2016ff. D630, GNU GPLv3
+# Copyright (C) 2015,2016,2017,2018ff. D630, GNU GPLv3
 # <https://github.com/D630/bpx>
 #
 # Forked from Ryan Caloras (ryan@bashhub.com)
@@ -208,24 +208,22 @@ function __bpx_edit_and_execute_command {
 };
 
 function __bpx_set_binds {
-	set -o emacs;
+	bind -m emacs-standard '"\C-x\C-x1": "\C-x\C-x2\C-x\C-x6"';
 
-	bind '"\C-x\C-x1": "\C-x\C-x2\C-x\C-x6"';
-
-	bind '"\C-x\C-x2": "\C-x\C-x3\C-x\C-x4\C-x\C-x5"';
-	bind -x '"\C-x\C-x3": rl0=$READLINE_LINE';
-	bind '"\C-x\C-x4": history-expand-line';
-	bind -x '"\C-x\C-x5": \__bpx_read_line && {
+	bind -m emacs-standard '"\C-x\C-x2": "\C-x\C-x3\C-x\C-x4\C-x\C-x5"';
+	bind -m emacs-standard -x '"\C-x\C-x3": rl0=$READLINE_LINE';
+	bind -m emacs-standard '"\C-x\C-x4": history-expand-line';
+	bind -m emacs-standard -x '"\C-x\C-x5": \__bpx_read_line && {
 			\__bpx_hook_preread "$rl0";
 			\__bpx_hook_preexec "$rl0";
 		};
 	';
 
-	bind '"\C-x\C-x6": "\C-x\C-x7"';
+	bind -m emacs-standard '"\C-x\C-x6": "\C-x\C-x7"';
 
-	bind '"\C-x\C-x7": "\C-x\C-x8\C-x\C-x9"';
-	bind '"\C-x\C-x8": accept-line';
-	bind -x '"\C-x\C-x9": \__bpx_hook_postread "$rl0"';
+	bind -m emacs-standard '"\C-x\C-x7": "\C-x\C-x8\C-x\C-x9"';
+	bind -m emacs-standard '"\C-x\C-x8": accept-line';
+	bind -m emacs-standard -x '"\C-x\C-x9": \__bpx_hook_postread "$rl0"';
 };
 
 function __bpx_set_rl1 {
@@ -251,18 +249,18 @@ function __bpx_set_rl2 {
 
 function __bpx_read_abort {
 	bpx_var=1;
-	bind '"\C-x\C-x8": abort';
+	bind -m emacs-standard '"\C-x\C-x8": abort';
 };
 
 function __bpx_read_accept {
 	bpx_var=0;
-	bind '"\C-x\C-x6": "\C-x\C-x7"';
-	bind '"\C-x\C-x8": accept-line';
+	bind -m emacs-standard '"\C-x\C-x6": "\C-x\C-x7"';
+	bind -m emacs-standard '"\C-x\C-x8": accept-line';
 };
 
 function __bpx_read_again {
 	bpx_var=1;
-	bind '"\C-x\C-x6": "\C-x\C-x1"';
+	bind -m emacs-standard '"\C-x\C-x6": "\C-x\C-x1"';
 };
 
 function __bpx_read_line {
