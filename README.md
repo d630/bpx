@@ -248,18 +248,18 @@ and execute the test file
 
 ### NOTICE
 
-bpx has been written and tested on [Debian GNU/Linux buster/sid (4.14.0-2-amd64
-x86-64)](https://www.debian.org) in/with [GNU bash
-4.4.12(1)-release](http://www.gnu.org/software/bash/).
+bpx has been written and tested in [GNU bash
+5.0-6](http://www.gnu.org/software/bash/) on [Debian GNU/Linux bullseye/sid
+(5.5.0-2-amd64 x86-64)](https://www.debian.org).
 
 bpx needs also the following programs/packages:
 
-- GNU coreutils 8.28: cat, chmod, rm
-- GNU diffutils 3.6: cmp
+- GNU coreutils 8.30: cat, chmod, rm
+- GNU diffutils 3.7: cmp
 
 Optional is (see above):
 
-- Vi IMproved 8.0 (Included patches: 1-1401)
+- Vi IMproved 8.2 (Included patches: 1-510)
 
 ### LICENCE
 
